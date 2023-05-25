@@ -1,5 +1,6 @@
 package components.menuItems
 
+import javafx.event.EventHandler
 import javafx.scene.control.Menu
 import javafx.scene.control.MenuItem
 import javafx.scene.input.KeyCombination
@@ -12,7 +13,7 @@ abstract class BaseMenuItem(
     init {
         val menuItem = MenuItem(itemName)
         menu.items.add(menuItem)
-        menuItem.setOnAction {
+        menuItem.onAction = EventHandler {
             onItemClicked()
         }
 
