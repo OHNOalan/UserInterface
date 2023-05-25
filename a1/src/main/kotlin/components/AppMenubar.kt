@@ -5,7 +5,7 @@ import javafx.scene.control.Menu
 import javafx.scene.control.MenuBar
 import javafx.scene.layout.VBox
 
-class AppMenubar : VBox() {
+class AppMenubar(appContent: AppContent) : VBox() {
     init {
         val menuBar = MenuBar()
 

@@ -28,9 +28,9 @@ class Main : Application() {
 //            setOnMouseClicked { println("centre pane clicked") }
 //        }
 
-        val topbar = AppTopbar()
         val statusbar = AppStatusbar()
         val appContent = AppContent(statusbar)
+        val topbar = AppTopbar(appContent)
 
         // put the panels side-by-side in a container
         val root = BorderPane().apply {

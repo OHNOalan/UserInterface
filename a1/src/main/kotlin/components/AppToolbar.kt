@@ -7,25 +7,27 @@ import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import javafx.scene.layout.HBox
 
-class AppToolbar : HBox() {
+class AppToolbar(appContent: AppContent) : HBox() {
     init {
         val homeImage = ImageView(Image("file:src/main/assets/home.png",15.0,15.0,true,true))
         val homeButton = Button("Home",homeImage)
-//        homeButton.onMouseClicked = EventHandler {
-//
-//        }
+        homeButton.onMouseClicked = EventHandler {appContent.Home() }
 
         val prevImage = ImageView(Image("file:src/main/assets/prev.png",15.0,15.0,true,true))
         val prevButton = Button("Prev",prevImage)
+        prevButton.onMouseClicked = EventHandler {appContent.Prev() }
 
         val nextImage = ImageView(Image("file:src/main/assets/next.png",15.0,15.0,true,true))
         val nextButton = Button("Next",nextImage)
+        nextButton.onMouseClicked = EventHandler {appContent.Next() }
 
         val deleteImage = ImageView(Image("file:src/main/assets/delete.png",15.0,15.0,true,true))
         val deleteButton = Button("Delete",deleteImage)
+        deleteButton.onMouseClicked = EventHandler {appContent.Delete() }
 
         val renameImage = ImageView(Image("file:src/main/assets/rename.png",15.0,15.0,true,true))
         val renameButton = Button("Rename",renameImage)
+        renameButton.onMouseClicked = EventHandler {appContent.Rename() }
 
         this.children.addAll(listOf(homeButton,prevButton,nextButton,deleteButton,renameButton))
         for(button in this.children){
