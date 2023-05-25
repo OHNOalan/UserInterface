@@ -63,6 +63,8 @@ class ContentDisplay : VBox() {
                         } else{
                             this.children.add(Text("File cannot be read"))
                         }
+                    } else {
+                        this.children.add(Text("Unsupported type"))
                     }
                 }
             }
