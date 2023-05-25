@@ -1,4 +1,5 @@
 import components.AppContent
+import components.AppStatusbar
 import components.AppTopbar
 import javafx.application.Application
 import javafx.scene.Scene
@@ -27,11 +28,15 @@ class Main : Application() {
 //            setOnMouseClicked { println("centre pane clicked") }
 //        }
 
+        val topbar = AppTopbar()
+        val statusbar = AppStatusbar()
+        val appContent = AppContent(statusbar)
 
         // put the panels side-by-side in a container
         val root = BorderPane().apply {
-            center = AppContent()
-            top = AppTopbar()
+            top = topbar
+            bottom = statusbar
+            center = appContent
         }
 
         // create the scene and show the stage
