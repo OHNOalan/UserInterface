@@ -1,5 +1,6 @@
 package components
 
+import components.menuItems.actionMenu.*
 import components.menuItems.fileMenu.ExitMenuItem
 import javafx.scene.control.Menu
 import javafx.scene.control.MenuBar
@@ -17,6 +18,11 @@ class AppMenubar(appContent: AppContent) : VBox() {
         menuBar.menus.add(viewMenu)
 
         val actionsMenu = Menu("Actions")
+        HomeMenuItem(actionsMenu, appContent)
+        PrevMenuItem(actionsMenu, appContent)
+        NextMenuItem(actionsMenu, appContent)
+        DeleteMenuItem(actionsMenu, appContent)
+        RenameMenuItem(actionsMenu, appContent)
         menuBar.menus.add(actionsMenu)
 
         val optionsMenu = Menu("Options")

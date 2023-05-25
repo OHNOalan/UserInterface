@@ -7,10 +7,8 @@ import javafx.scene.image.ImageView
 import javafx.scene.layout.*
 import javafx.scene.paint.Color
 import javafx.scene.text.Text
-import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
-import java.util.*
 
 
 class ContentDisplay : VBox() {
@@ -28,7 +26,7 @@ class ContentDisplay : VBox() {
         }
         }
 
-    fun changePath(path: String){
+    fun changeDirPath(path: String){
         dirPath = path
     }
 
@@ -51,7 +49,8 @@ class ContentDisplay : VBox() {
                     if(ext == "png" || ext == "jpg" || ext == "bmp"){
                         if(file.canRead()){
                             val imageUrl = file.toURI().toURL().toString()
-                            val imageView = ImageView(Image(imageUrl,this.width,this.height,true,true))
+                            val image = Image(imageUrl,this.width-10,this.height-10,true,false)
+                            val imageView = ImageView(image)
                             this.children.add(imageView)
                         } else{
                             this.children.add(Text("File cannot be read"))

@@ -2,15 +2,19 @@ package components.FileContent
 
 import components.AppStatusbar
 import javafx.event.EventHandler
-import javafx.scene.control.ScrollPane
-import javafx.scene.control.ToggleButton
-import javafx.scene.control.ToggleGroup
-import javafx.scene.layout.Pane
+import javafx.geometry.Insets
+import javafx.geometry.Pos
+import javafx.scene.Scene
+import javafx.scene.control.*
+import javafx.scene.layout.HBox
+import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
 import javafx.scene.text.Text
+import javafx.stage.Stage
 import java.io.File
 
-class FileList(val statusbar: AppStatusbar, val contentDisplay: ContentDisplay) : ScrollPane() {
+
+class FileList(val statusbar: AppStatusbar, val contentsDisplay: ContentDisplay) : StackPane() {
     // determine starting directory
     // this will be the "test" subfolder in your project directory
     private val rootPath = "${System.getProperty("user.dir")}/test/"
@@ -20,77 +24,67 @@ class FileList(val statusbar: AppStatusbar, val contentDisplay: ContentDisplay) 
     // file is the path of current selected file/directory
     private var selectedFile = ""
     private var dirDepth = 0
-    private val listContainer = VBox()
-    private val toggleGroup = ToggleGroup().apply {
-        selectedToggleProperty().addListener { _, _, newValue ->
-            val file = "${(newValue as ToggleButton?)?.text ?: ""}"
-            select(file)
-        }
-    }
+    private val listView = ListView<String>()
+
     init {
+        listView.selectionModel.selectIndices(-1)
+        listView.selectionModel.selectedItemProperty().addListener { _, oldValue, newValue ->
+            selectedFile = newValue?: ""
+            statusbar.changePath(dirPath + selectedFile)
+            contentsDisplay.select(selectedFile)
+        }
+        listView.onMouseClicked = EventHandler {
+            if(it.clickCount == 2){
+                if(File(dirPath + selectedFile).isDirectory){
+                    dirDepth += 1
+                    dirPath = dirPath + selectedFile + "/"
+                    selectedFile = ""
+                    dir = File(dirPath)
+                    updateFileList()
+                    listView.selectionModel.selectIndices(-1) // might change selectedFile
+                }
+            }
+        }
+
         updateFileList()
-        contentDisplay.select("")
-        // toggleGroup.selectToggle(toggleGroup.toggles.first())
-        this.content = listContainer
+        deSelect()
+        this.children.add(listView)
         this.prefWidth = 200.0
     }
 
-    private fun select(file : String) {
-        selectedFile = file
-        statusbar.changePath(dirPath + selectedFile)
-        contentDisplay.select(file)
+    private fun deSelect() {
+        listView.selectionModel.selectIndices(-1)
+        statusbar.changePath(dirPath)
+        contentsDisplay.changeDirPath(dirPath)
+        contentsDisplay.select("")
     }
 
     private fun updateFileList() {
         val fileList = dir.list()
         fileList.sort()
 
-        listContainer.children.clear()
-        fileList.forEach {
-            val toggle = ToggleButton(
-                it,
-                Pane().apply {
-                    style = "-fx-border-color: red; -fx-border-width:4; "
-                }
-            )
-
-            if(File(dirPath + it).isDirectory){
-                val fileName = it
-                toggle.onMouseClicked = EventHandler {
-                    if(it.clickCount == 2){
-                        dirDepth += 1
-                        dirPath = dirPath + fileName + "/"
-                        selectedFile = ""
-                        dir = File(dirPath)
-                        updateFileList()
-                        select("")
-                    }
-                }
-            }
-
-            toggleGroup.apply { toggle.toggleGroup = this }
-            listContainer.children.add(toggle)
-        }
+        listView.items.clear()
+        listView.items.addAll(fileList)
 
         statusbar.changePath(dirPath)
-        contentDisplay.changePath(dirPath)
+        contentsDisplay.changeDirPath(dirPath)
     }
 
     fun Home(){
+        dirDepth = 0
         dirPath = rootPath
         dir = File(dirPath)
         updateFileList()
-        select("")
+        deSelect()
     }
 
     fun Prev(){
         if(dirDepth != 0) {
             dirDepth -= 1
-            val oldDirName = dir.name
             dir = dir.parentFile
             dirPath = dir.path + "/"
             updateFileList()
-            select(oldDirName)
+            deSelect()
         }
     }
 
@@ -104,24 +98,64 @@ class FileList(val statusbar: AppStatusbar, val contentDisplay: ContentDisplay) 
             selectedFile = ""
             dir = File(dirPath)
             updateFileList()
-            select("")
+            deSelect()
         }
     }
 
     fun Delete(){
         if(selectedFile != ""){
-            File(dirPath + selectedFile).delete()
-            updateFileList()
-            select("")
+            val stage = Stage()
+            val comp = VBox().apply { alignment = Pos.CENTER }
+            val buttons = HBox().apply { alignment = Pos.CENTER ; padding = Insets(10.0) }
+            val confirmMessage = Text("You want to delete file \"${listView.selectionModel.selectedItem}\"?")
+            val cancel = Button("Cancel").apply {onMouseClicked = EventHandler {stage.close()}}
+            val ok = Button("OK").apply {
+                onMouseClicked = EventHandler {
+                    File(dirPath + selectedFile).delete()
+                    updateFileList()
+                    deSelect()
+                    stage.close()
+                }
+            }
+            buttons.children.addAll(cancel,ok)
+            comp.children.add(confirmMessage)
+            comp.children.add(buttons)
+
+            val stageScene = Scene(comp, 300.0, 100.0)
+            stage.scene = stageScene
+            stage.show()
         }
     }
 
     fun Rename(){
         if(selectedFile != ""){
-            val newName = "newName.png"
-            File(dirPath + selectedFile).renameTo(File(dirPath + newName))
-            updateFileList()
-            select(newName)
+            val stage = Stage()
+            val comp = VBox().apply { alignment = Pos.CENTER }
+            val buttons = HBox().apply { alignment = Pos.CENTER ; padding = Insets(10.0) }
+            val renameMessage = Text("Enter new name of the file \"${selectedFile}\"?")
+            val nameField = TextField().apply {
+                promptText = "Enter the name"
+            }
+            val cancel = Button("Cancel").apply {onAction = EventHandler {stage.close()}}
+            val ok = Button("OK").apply {
+                onMouseClicked = EventHandler {
+                    // required name detection
+                    File(dirPath + selectedFile).renameTo(File(dirPath + nameField.text))
+                    updateFileList()
+                    deSelect()
+                    stage.close()
+                }
+            }
+            cancel.requestFocus()
+            nameField.requestFocus()
+            buttons.children.addAll(cancel,ok)
+            comp.children.add(renameMessage)
+            comp.children.add(nameField)
+            comp.children.add(buttons)
+
+            val stageScene = Scene(comp, 300.0, 100.0)
+            stage.scene = stageScene
+            stage.show()
         }
     }
 }
