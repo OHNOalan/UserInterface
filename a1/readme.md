@@ -6,4 +6,6 @@ Next Image: <a href="https://www.flaticon.com/free-icons/next" title="next icons
 
 Delete Image: <a href="https://www.flaticon.com/free-icons/delete" title="delete icons">Delete icons created by Freepik - Flaticon</a>
 
+Move Image: <a href="https://www.flaticon.com/free-icons/drag" title="drag icons">Drag icons created by Freepik - Flaticon</a>
+
 Rename Image: <a href="https://www.flaticon.com/free-icons/rename" title="rename icons">Rename icons created by zky.icon - Flaticon</a>
