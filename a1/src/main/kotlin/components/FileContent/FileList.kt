@@ -10,11 +10,12 @@ import javafx.scene.layout.HBox
 import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
 import javafx.scene.text.Text
+import javafx.stage.DirectoryChooser
 import javafx.stage.Stage
 import java.io.File
 
 
-class FileList(val statusbar: AppStatusbar, val contentsDisplay: ContentDisplay) : StackPane() {
+class FileList(val statusbar: AppStatusbar, val contentsDisplay: ContentDisplay, val stage: Stage?) : StackPane() {
     // determine starting directory
     // this will be the "test" subfolder in your project directory
     private val rootPath = "${System.getProperty("user.dir")}/test/"
@@ -124,6 +125,21 @@ class FileList(val statusbar: AppStatusbar, val contentsDisplay: ContentDisplay)
             val stageScene = Scene(comp, 300.0, 100.0)
             stage.scene = stageScene
             stage.show()
+        }
+    }
+
+    fun Move(){
+        if(selectedFile != ""){
+            val directoryChooser = DirectoryChooser().apply {
+                initialDirectory = File(dirPath)
+            }
+            val selectedDirectory = directoryChooser.showDialog(stage)
+            if(selectedDirectory != null){
+                val newPath = selectedDirectory.absolutePath
+                File(dirPath + selectedFile).renameTo(File(newPath + "/" + selectedFile))
+                updateFileList()
+                deSelect()
+            }
         }
     }
 

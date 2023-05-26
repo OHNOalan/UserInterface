@@ -22,6 +22,7 @@ class AppMenubar(appContent: AppContent) : VBox() {
         PrevMenuItem(actionsMenu, appContent)
         NextMenuItem(actionsMenu, appContent)
         DeleteMenuItem(actionsMenu, appContent)
+        MoveMenuItem(actionsMenu, appContent)
         RenameMenuItem(actionsMenu, appContent)
         menuBar.menus.add(actionsMenu)
 

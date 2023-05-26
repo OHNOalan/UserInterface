@@ -10,7 +10,7 @@ class Main : Application() {
     override fun start(primaryStage: Stage?) {
 
         val statusbar = AppStatusbar()
-        val appContent = AppContent(statusbar)
+        val appContent = AppContent(statusbar,primaryStage)
         val topbar = AppTopbar(appContent)
 
 //        primaryStage?.addEventFilter(KeyEvent.KEY_PRESSED) { event ->

@@ -25,11 +25,15 @@ class AppToolbar(appContent: AppContent) : HBox() {
         val deleteButton = Button("Delete",deleteImage)
         deleteButton.onAction = EventHandler { appContent.Delete() }
 
+        val moveImage = ImageView(Image("file:src/main/assets/move.png",15.0,15.0,true,true))
+        val moveButton = Button("Move",moveImage)
+        moveButton.onAction = EventHandler { appContent.Move() }
+
         val renameImage = ImageView(Image("file:src/main/assets/rename.png",15.0,15.0,true,true))
         val renameButton = Button("Rename",renameImage)
         renameButton.onAction = EventHandler { appContent.Rename() }
 
-        this.children.addAll(listOf(homeButton,prevButton,nextButton,deleteButton,renameButton))
+        this.children.addAll(listOf(homeButton,prevButton,nextButton,deleteButton,moveButton,renameButton))
         for(button in this.children){
             setMargin(button, Insets(2.0,5.0,2.0,5.0))
         }
