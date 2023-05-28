@@ -1,6 +1,10 @@
 package components.FileContent
 
 import components.AppStatusbar
+import javafx.beans.binding.BooleanBinding
+import javafx.beans.property.BooleanProperty
+import javafx.beans.property.BooleanPropertyBase
+import javafx.beans.property.SimpleBooleanProperty
 import javafx.event.EventHandler
 import javafx.geometry.Insets
 import javafx.geometry.Pos
@@ -9,10 +13,12 @@ import javafx.scene.control.*
 import javafx.scene.layout.HBox
 import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
+import javafx.scene.paint.Color
 import javafx.scene.text.Text
 import javafx.stage.DirectoryChooser
 import javafx.stage.Stage
 import java.io.File
+import javax.naming.Binding
 
 
 class FileList(val statusbar: AppStatusbar, val contentsDisplay: ContentDisplay, val stage: Stage?) : StackPane() {
@@ -51,6 +57,8 @@ class FileList(val statusbar: AppStatusbar, val contentsDisplay: ContentDisplay,
         deSelect()
         this.children.add(listView)
         this.prefWidth = 200.0
+
+        this.requestFocus()
     }
 
     private fun deSelect() {
@@ -147,27 +155,56 @@ class FileList(val statusbar: AppStatusbar, val contentsDisplay: ContentDisplay,
         if(selectedFile != ""){
             val stage = Stage()
             val comp = VBox().apply { alignment = Pos.CENTER }
-            val buttons = HBox().apply { alignment = Pos.CENTER ; padding = Insets(10.0) }
+            val buttons = HBox().apply { alignment = Pos.CENTER }
             val renameMessage = Text("Enter new name of the file \"${selectedFile}\"?")
             val nameField = TextField().apply {
                 promptText = "Enter the name"
+            }
+            val warnMessage = Label("").apply {
+                textProperty().addListener() { _, _, newValue ->
+                    if(newValue.isEmpty().not()) comp.children.add(2,this)
+                    else comp.children.remove(this)
+                }
+                textFill = Color.RED
+            }
+            val reset = Button("Reset").apply {
+                onAction = EventHandler {
+                    nameField.text = ""
+                    warnMessage.text = ""
+                }
             }
             val cancel = Button("Cancel").apply {onAction = EventHandler {stage.close()}}
             val ok = Button("OK").apply {
                 onMouseClicked = EventHandler {
                     // required name detection
-                    File(dirPath + selectedFile).renameTo(File(dirPath + nameField.text))
-                    updateFileList()
-                    deSelect()
-                    stage.close()
+                    val name = nameField.text
+                    if(name == "") {
+                        warnMessage.text = "Name cannot be empty string."
+                    } else if(name == selectedFile) {
+                        warnMessage.text = "Name cannot be the same as previous."
+                    } else if(name.lastIndexOf('\\') != -1) {
+                        warnMessage.text = "Name cannot contain \" \\ \" char."
+                    } else if(name.lastIndexOf('/') != -1) {
+                        warnMessage.text = "Name cannot contain \" / \" char."
+                    } else {
+                        File(dirPath + selectedFile).renameTo(File(dirPath + nameField.text))
+                        updateFileList()
+                        deSelect()
+                        stage.close()
+                    }
                 }
             }
-            cancel.requestFocus()
-            nameField.requestFocus()
-            buttons.children.addAll(cancel,ok)
+
+            setMargin(reset, Insets(0.0,10.0,0.0,10.0))
+            setMargin(cancel, Insets(0.0,10.0,0.0,10.0))
+            setMargin(ok, Insets(0.0,10.0,0.0,10.0))
+
+            buttons.children.addAll(reset,cancel,ok)
             comp.children.add(renameMessage)
             comp.children.add(nameField)
             comp.children.add(buttons)
+
+            setMargin(nameField,Insets(10.0))
 
             val stageScene = Scene(comp, 300.0, 100.0)
             stage.scene = stageScene
