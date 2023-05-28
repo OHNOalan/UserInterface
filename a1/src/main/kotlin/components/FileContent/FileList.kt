@@ -1,10 +1,6 @@
 package components.FileContent
 
 import components.AppStatusbar
-import javafx.beans.binding.BooleanBinding
-import javafx.beans.property.BooleanProperty
-import javafx.beans.property.BooleanPropertyBase
-import javafx.beans.property.SimpleBooleanProperty
 import javafx.event.EventHandler
 import javafx.geometry.Insets
 import javafx.geometry.Pos
@@ -18,7 +14,6 @@ import javafx.scene.text.Text
 import javafx.stage.DirectoryChooser
 import javafx.stage.Stage
 import java.io.File
-import javax.naming.Binding
 
 
 class FileList(val statusbar: AppStatusbar, val contentsDisplay: ContentDisplay, val stage: Stage?) : StackPane() {
