@@ -1,3 +1,3 @@
 
-rootProject.name = "a1starter"
+rootProject.name = "File-Explorer"
 
