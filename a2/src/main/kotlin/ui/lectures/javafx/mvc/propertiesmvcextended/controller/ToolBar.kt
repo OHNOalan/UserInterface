@@ -20,6 +20,7 @@ class ToolBar(private val model: Model): HBox() {
         }
         val delButton = Button("Del Image",ImageView(Image("file:src/main/assets/deleteImage.png",20.0,20.0,true,true))).apply {
             onMouseReleased = EventHandler { model.delImage() }
+            isDisable = true
         }
         val rotateLeftButton = Button("Rotate Left",ImageView(Image("file:src/main/assets/rotateLeft.png",20.0,20.0,true,true))).apply {
             onMouseReleased = EventHandler { model.operate(OperationIndex.ROTATE_LEFT) }
@@ -37,24 +38,18 @@ class ToolBar(private val model: Model): HBox() {
             onMouseReleased = EventHandler { model.operate(OperationIndex.RESET) }
         }
 
+        model.SelectedImage.addListener {_,_,newValue ->
+            delButton.isDisable = newValue == null
+        }
+
         val modeToggleGroup = ToggleGroup().apply {
-            selectedToggleProperty().addListener { _, oldValue, newValue ->
+            selectedToggleProperty().addListener { _, _, newValue ->
                 newValue as ToggleButton
-                if (newValue == null) oldValue.isSelected = true;
-                else if (newValue.text == "Cascade") model.cascade()
+                if (newValue.text == "Cascade") model.cascade()
                 else if (newValue.text == "Tile") model.tile()
                 when(newValue.text) {
-                    "Cascade" -> {
-                        (listOf <Button>(rotateLeftButton, rotateRightButton, zoomInButton, zoomOutButton, resetButton)).forEach {
-                            it.isDisable = false
-                        }
-                    }
-                    "Tile" -> {
-
-                        (listOf <Button>(rotateLeftButton, rotateRightButton, zoomInButton, zoomOutButton, resetButton)).forEach {
-                            it.isDisable = true
-                        }
-                    }
+                    "Cascade" -> (listOf <Button>(rotateLeftButton, rotateRightButton, zoomInButton, zoomOutButton, resetButton)).forEach {it.isDisable = false}
+                    "Tile" -> (listOf <Button>(rotateLeftButton, rotateRightButton, zoomInButton, zoomOutButton, resetButton)).forEach {it.isDisable = true}
                 }
             }
         }
@@ -68,10 +63,7 @@ class ToolBar(private val model: Model): HBox() {
         }
         modeToggleGroup.selectToggle(modeToggleGroup.toggles.first())
 
-        this.children.addAll(addButton,delButton)
-        this.children.addAll(rotateLeftButton,rotateRightButton)
-        this.children.addAll(zoomInButton,zoomOutButton)
-        this.children.addAll(resetButton)
+        this.children.addAll(addButton,delButton,rotateLeftButton,rotateRightButton,zoomInButton,zoomOutButton,resetButton)
         this.children.addAll(cascadeButton,tileButton)
 
         this.children.forEach {

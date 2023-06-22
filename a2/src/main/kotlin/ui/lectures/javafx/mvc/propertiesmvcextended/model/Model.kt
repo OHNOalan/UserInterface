@@ -1,6 +1,5 @@
 package ui.lectures.javafx.mvc.propertiesmvcextended.model
 
-import javafx.beans.property.ReadOnlyDoubleProperty
 import javafx.beans.property.ReadOnlyDoubleWrapper
 import javafx.beans.property.ReadOnlyIntegerProperty
 import javafx.beans.property.ReadOnlyIntegerWrapper
@@ -13,17 +12,16 @@ import javafx.scene.control.Alert
 import javafx.stage.FileChooser
 import javafx.stage.Stage
 import java.io.File
-import java.lang.Math.ceil
+import java.util.Random
 
 class Model(private val stage : Stage?) {
+
+    private var displayState = DisplayIndex.CASCADE
 
     val PaneWidth = ReadOnlyDoubleWrapper(0.0)
     val PaneHeight = ReadOnlyDoubleWrapper(0.0)
 
     private val rootPath = "${System.getProperty("user.dir")}/test/"
-
-    private val displayState = ReadOnlyObjectWrapper<DisplayIndex>(DisplayIndex.CASCADE)
-    val DisplayState: ReadOnlyObjectProperty<DisplayIndex> = displayState.readOnlyProperty
 
     private val imagesCount = ReadOnlyIntegerWrapper()
     val ImagesCount: ReadOnlyIntegerProperty = imagesCount.readOnlyProperty
@@ -39,17 +37,13 @@ class Model(private val stage : Stage?) {
     }
 
     fun select(imageDisplay: ImageDisplay) {
-        imageList.value.forEach {
-            it.deselect()
-        }
+        selectedImage.value?.deselect()
         imageDisplay.select()
         setSelectedImage(imageDisplay)
     }
 
     fun deselect() {
-        imageList.value.forEach {
-            it.deselect()
-        }
+        selectedImage.value?.deselect()
         setSelectedImage(null)
     }
 
@@ -58,17 +52,18 @@ class Model(private val stage : Stage?) {
         val selectedFile = fileChooser.showOpenDialog(stage)
         if(selectedFile != null){
             val path = selectedFile.toURI().toURL().toExternalForm()
-            val newImage = ImageDisplay(displayState.value,path,this)
-            imageList.value.add(newImage)
-            newImage.select()
-            select(newImage)
-            if(displayState.value == DisplayIndex.TILE) {
-                tile()
+            val newImage = ImageDisplay(displayState,path,this).apply {
+                x = Random().nextDouble() * (PaneWidth.value)
+                y = Random().nextDouble() * (PaneHeight.value)
             }
+            imageList.value.add(newImage)
+            select(newImage)
+            if(displayState == DisplayIndex.TILE) tile()
         } else {
-            val alert = Alert(Alert.AlertType.ERROR)
-            alert.title = "ERROR"
-            alert.contentText = "Select File is not a picture"
+            val alert = Alert(Alert.AlertType.ERROR).apply {
+                title = "ERROR"
+                contentText = "Select File is not a picture"
+            }
             alert.showAndWait()
         }
     }
@@ -77,38 +72,29 @@ class Model(private val stage : Stage?) {
         if(selectedImage.value != null) {
             imageList.value.remove(selectedImage.value)
             setSelectedImage(null)
-            if(displayState.value == DisplayIndex.TILE) tile()
+            if(displayState == DisplayIndex.TILE) tile()
         } else {
-            val alert = Alert(Alert.AlertType.ERROR)
-            alert.title = "ERROR"
-            alert.contentText = "Select File is not a picture"
+            val alert = Alert(Alert.AlertType.ERROR).apply {
+                title = "ERROR"
+                contentText = "Select File is not a picture"
+            }
             alert.showAndWait()
         }
     }
 
-    fun operate(operation : OperationIndex) {
-        selectedImage.value?.operate(operation)
-    }
+    fun operate(operation : OperationIndex) { selectedImage.value?.operate(operation) }
 
     fun cascade() {
-        imageList.value.forEach { it.cascade() }
-//        println("Cascade called")
+        if (displayState == DisplayIndex.TILE) {
+            imageList.value.forEach { it.cascade() }
+        }
+        displayState = DisplayIndex.CASCADE
     }
 
     fun tile() {
-        displayState.value = DisplayIndex.TILE
-//        println("tile activate")
-        println("PaneWidth: ${PaneWidth.value} / imagePrefWidth: ${imagePrefWidthMax}")
-        val size = imageList.value.size
-        val col = (PaneWidth.value / imagePrefWidthMax).toInt()
-        val row = ceil(size.toDouble() / col).toInt()
-        println("col : $col, row : $row")
-        PaneHeight.value = row * imagePrefHeightMax
-
         var x = imagePrefWidthMax
         var y = imagePrefHeightMax
         imageList.forEach {
-            print("(x: $x, y: $y) (width: ${it.width}, height: ${it.height})")
             it.tile(x-imagePrefWidthMax,y-imagePrefHeightMax)
             if(x + imagePrefWidthMax <= PaneWidth.value) {
                 x += imagePrefWidthMax
@@ -117,6 +103,7 @@ class Model(private val stage : Stage?) {
                 y += imagePrefHeightMax
             }
         }
+        displayState = DisplayIndex.TILE
     }
 
     init {

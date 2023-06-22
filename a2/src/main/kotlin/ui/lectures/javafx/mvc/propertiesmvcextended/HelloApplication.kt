@@ -1,13 +1,7 @@
 package ui.lectures.javafx.mvc.propertiesmvcextended
 
 import javafx.application.Application
-import javafx.beans.binding.Bindings
-import javafx.geometry.Orientation
-import javafx.geometry.Pos
 import javafx.scene.Scene
-import javafx.scene.control.Separator
-import javafx.scene.image.Image
-import javafx.scene.image.ImageView
 import javafx.scene.layout.*
 import javafx.stage.Stage
 import ui.lectures.javafx.mvc.propertiesmvcextended.controller.ToolBar
@@ -55,11 +49,13 @@ class HelloPropertiesMVCExtended : Application() {
         val statusBar = StatusBar(myModel)
 
 
-        val root = VBox(toolBar,pictures,statusBar)
-        val primaryScene = Scene(root, 1200.0, 600.0)
+        val root = BorderPane().apply {
+            center = pictures
+            top = toolBar
+            bottom = statusBar
+        }
 
-        VBox.setVgrow(pictures, Priority.ALWAYS)
-        root.prefHeightProperty().bind(primaryScene.heightProperty())
+        val primaryScene = Scene(root, 1200.0, 600.0)
 
         stage.apply {
             title = "LightBox (c) 2023 Alan Lee"
