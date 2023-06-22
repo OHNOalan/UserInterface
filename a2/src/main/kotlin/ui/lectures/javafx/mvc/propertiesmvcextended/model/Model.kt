@@ -12,7 +12,8 @@ import javafx.scene.control.Alert
 import javafx.stage.FileChooser
 import javafx.stage.Stage
 import java.io.File
-import java.util.Random
+import java.lang.Exception
+import javax.imageio.ImageIO
 
 class Model(private val stage : Stage?) {
 
@@ -51,14 +52,28 @@ class Model(private val stage : Stage?) {
         val fileChooser = FileChooser().apply { initialDirectory = File(rootPath) }
         val selectedFile = fileChooser.showOpenDialog(stage)
         if(selectedFile != null){
-            val path = selectedFile.toURI().toURL().toExternalForm()
-            val newImage = ImageDisplay(displayState,path,this).apply {
-                x = Random().nextDouble() * (PaneWidth.value)
-                y = Random().nextDouble() * (PaneHeight.value)
+            if(selectedFile.canRead()) {
+                val path = selectedFile.toURI().toURL().toExternalForm()
+                try {
+                    ImageIO.read(selectedFile)
+                    val newImage = ImageDisplay(displayState,path,PaneWidth.value,PaneHeight.value,this)
+                    imageList.value.add(newImage)
+                    select(newImage)
+                } catch (e : Exception) {
+                    val alert = Alert(Alert.AlertType.ERROR).apply {
+                        title = "ERROR"
+                        contentText = "Select File is likely not an image"
+                    }
+                    alert.showAndWait()
+                }
+                if(displayState == DisplayIndex.TILE) tile()
+            } else {
+                val alert = Alert(Alert.AlertType.ERROR).apply {
+                    title = "ERROR"
+                    contentText = "Select File is not readable"
+                }
+                alert.showAndWait()
             }
-            imageList.value.add(newImage)
-            select(newImage)
-            if(displayState == DisplayIndex.TILE) tile()
         } else {
             val alert = Alert(Alert.AlertType.ERROR).apply {
                 title = "ERROR"
@@ -69,17 +84,9 @@ class Model(private val stage : Stage?) {
     }
 
     fun delImage() {
-        if(selectedImage.value != null) {
-            imageList.value.remove(selectedImage.value)
-            setSelectedImage(null)
-            if(displayState == DisplayIndex.TILE) tile()
-        } else {
-            val alert = Alert(Alert.AlertType.ERROR).apply {
-                title = "ERROR"
-                contentText = "Select File is not a picture"
-            }
-            alert.showAndWait()
-        }
+        imageList.value.remove(selectedImage.value)
+        setSelectedImage(null)
+        if(displayState == DisplayIndex.TILE) tile()
     }
 
     fun operate(operation : OperationIndex) { selectedImage.value?.operate(operation) }

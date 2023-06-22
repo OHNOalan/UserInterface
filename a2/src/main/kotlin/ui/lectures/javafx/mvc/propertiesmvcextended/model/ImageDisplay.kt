@@ -6,10 +6,11 @@ import javafx.scene.input.MouseEvent
 import javafx.scene.layout.*
 import javafx.scene.paint.Color
 import javafx.scene.shape.Rectangle
+import java.lang.Math.random
 
 
-class ImageDisplay(private var displayIndex: DisplayIndex, url : String, model: Model)
-    : ImageView(Image(url,imagePrefWidthMax,imagePrefHeightMax,true,true)){
+class ImageDisplay(private var displayIndex: DisplayIndex, url : String, x_range : Double, y_range: Double, model: Model)
+    : ImageView(){
 
     // preserve for drag
     private var curCoordinateX = 0.0
@@ -35,6 +36,8 @@ class ImageDisplay(private var displayIndex: DisplayIndex, url : String, model: 
     val fileName = url.substring(url.lastIndexOf("/") + 1, url.length)
 
     init {
+        val i = Image(url,imagePrefWidthMax,imagePrefHeightMax,true,true)
+        image = i
         rectangle.xProperty().bind(xProperty())
         rectangle.yProperty().bind(yProperty())
 //        rectangle.widthProperty().bind(fitWidthProperty())
@@ -70,6 +73,9 @@ class ImageDisplay(private var displayIndex: DisplayIndex, url : String, model: 
             }
             it.consume()
         }
+        println("$x,$y")
+        x = random() * (x_range - i.width)
+        y = random() * (y_range - i.height)
     }
 
     fun select() {

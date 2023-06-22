@@ -5,18 +5,21 @@ import javafx.beans.Observable
 import javafx.event.EventHandler
 import javafx.scene.control.ScrollPane
 import javafx.scene.layout.*
+import ui.lectures.javafx.mvc.propertiesmvcextended.model.BorderObject
 import ui.lectures.javafx.mvc.propertiesmvcextended.model.Model
 class Pictures(private val model: Model) : ScrollPane(), InvalidationListener {
-    private val pane = Pane()
+    private val pane = Pane().apply {
+        border = BorderObject
+    }
     init {
         content = pane
         pane.minWidthProperty().bind(widthProperty())
         pane.minHeightProperty().bind(heightProperty())
         model.PaneWidth.bind(pane.widthProperty())
-        model.PaneWidth.bind(pane.heightProperty())
+        model.PaneHeight.bind(pane.heightProperty())
         model.ImageList.addListener(this)
         invalidated(null)
-        onMousePressed = EventHandler { model.deselect() }
+        onMousePressed = EventHandler {model.deselect()}
     }
 
     override fun invalidated(observable: Observable?) {
