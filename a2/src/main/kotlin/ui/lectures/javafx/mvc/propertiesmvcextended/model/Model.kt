@@ -17,7 +17,8 @@ import javax.imageio.ImageIO
 
 class Model(private val stage : Stage?) {
 
-    private var displayState = DisplayIndex.CASCADE
+    private var displayState = ReadOnlyObjectWrapper<DisplayIndex>(DisplayIndex.CASCADE)
+    val DisplayState = displayState.readOnlyProperty
 
     val PaneWidth = ReadOnlyDoubleWrapper(0.0)
     val PaneHeight = ReadOnlyDoubleWrapper(0.0)
@@ -56,7 +57,7 @@ class Model(private val stage : Stage?) {
                 val path = selectedFile.toURI().toURL().toExternalForm()
                 try {
                     ImageIO.read(selectedFile)
-                    val newImage = ImageDisplay(displayState,path,PaneWidth.value,PaneHeight.value,this)
+                    val newImage = ImageDisplay(displayState.value,path,PaneWidth.value,PaneHeight.value,this)
                     imageList.value.add(newImage)
                     select(newImage)
                 } catch (e : Exception) {
@@ -66,7 +67,7 @@ class Model(private val stage : Stage?) {
                     }
                     alert.showAndWait()
                 }
-                if(displayState == DisplayIndex.TILE) tile()
+                if(displayState.value == DisplayIndex.TILE) tile()
             } else {
                 val alert = Alert(Alert.AlertType.ERROR).apply {
                     title = "ERROR"
@@ -86,16 +87,16 @@ class Model(private val stage : Stage?) {
     fun delImage() {
         imageList.value.remove(selectedImage.value)
         setSelectedImage(null)
-        if(displayState == DisplayIndex.TILE) tile()
+        if(displayState.value == DisplayIndex.TILE) tile()
     }
 
     fun operate(operation : OperationIndex) { selectedImage.value?.operate(operation) }
 
     fun cascade() {
-        if (displayState == DisplayIndex.TILE) {
+        if (displayState.value == DisplayIndex.TILE) {
             imageList.value.forEach { it.cascade() }
         }
-        displayState = DisplayIndex.CASCADE
+        displayState.value = DisplayIndex.CASCADE
     }
 
     fun tile() {
@@ -110,10 +111,16 @@ class Model(private val stage : Stage?) {
                 y += imagePrefHeightMax
             }
         }
-        displayState = DisplayIndex.TILE
+        displayState.value = DisplayIndex.TILE
     }
 
     init {
+        PaneWidth.addListener { _,_,_ ->
+            println("${PaneWidth.value}")
+            if (displayState.value == DisplayIndex.TILE) {
+                tile()
+            }
+        }
         imagesCount.bind(imageList.sizeProperty())
     }
 }

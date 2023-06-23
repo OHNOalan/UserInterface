@@ -9,7 +9,7 @@ import javafx.scene.shape.Rectangle
 import java.lang.Math.random
 
 
-class ImageDisplay(private var displayIndex: DisplayIndex, url : String, x_range : Double, y_range: Double, model: Model)
+class ImageDisplay(private var displayIndex: DisplayIndex, url : String, xRange : Double, yRange: Double, model: Model)
     : ImageView(){
 
     // preserve for drag
@@ -40,7 +40,8 @@ class ImageDisplay(private var displayIndex: DisplayIndex, url : String, x_range
         image = i
         rectangle.xProperty().bind(xProperty())
         rectangle.yProperty().bind(yProperty())
-//        rectangle.widthProperty().bind(fitWidthProperty())
+        rectangle.widthProperty().bind(i.widthProperty())
+        rectangle.heightProperty().bind(i.heightProperty())
         rectangle.rotateProperty().bind(rotateProperty())
         rectangle.scaleXProperty().bind(scaleXProperty())
         rectangle.scaleYProperty().bind(scaleYProperty())
@@ -73,14 +74,11 @@ class ImageDisplay(private var displayIndex: DisplayIndex, url : String, x_range
             }
             it.consume()
         }
-        println("$x,$y")
-        x = random() * (x_range - i.width)
-        y = random() * (y_range - i.height)
+        x = random() * (xRange - i.width)
+        y = random() * (yRange - i.height)
     }
 
     fun select() {
-        rectangle.widthProperty().bind(fitWidthProperty())
-        rectangle.heightProperty().bind(fitHeightProperty())
         (parent as Pane).children.add(rectangle)
         toFront()
     }
