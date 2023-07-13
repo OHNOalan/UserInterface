@@ -86,8 +86,8 @@ class Model(
                 AudioClip(explosionSoundTrack).play()
                 EMIterator.remove()
                 lives.value--
-                player.value.reset()
                 if(lives.value == 0) lose()
+                else player.value.reset()
             }
         }
         val PMIterator = playerMissiles.value.iterator()
