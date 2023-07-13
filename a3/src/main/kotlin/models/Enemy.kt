@@ -44,20 +44,28 @@ class Enemy(val model : Model, row : Int, col : Int, val type : EnemyIndex, leve
                 && PositionY.value + enemyHeight > model.Player.value.PositionY.value
     }
     fun moveToBoundary() : Boolean {
-        return positionX.value <= 0.0 || positionX.value + enemyWidth >= sceneWidth
+        return positionX.value < 0.0 || positionX.value + enemyWidth > sceneWidth
     }
     fun changeDirection() {
-        movement = when(movement) {
-            MOVEMENT.LEFT -> MOVEMENT.RIGHT
-            MOVEMENT.RIGHT -> MOVEMENT.LEFT
+        when(movement) {
+            MOVEMENT.LEFT -> {
+                movement = MOVEMENT.RIGHT
+                positionX.value += moveSpeed
+            }
+            MOVEMENT.RIGHT -> {
+                movement = MOVEMENT.LEFT
+                positionX.value -= moveSpeed
+            }
             MOVEMENT.NONE -> MOVEMENT.NONE
         }
         down()
     }
     private fun down() {
         positionY.value += enemyHeight
-        moveSpeed += enemyAccelerateSpeed
         if(positionY.value >= sceneHeight) model.EnemyList.value.remove(this)
+    }
+    fun accelerate() {
+        moveSpeed += enemyAccelerateSpeed
     }
     fun stop() {
         movement = MOVEMENT.NONE

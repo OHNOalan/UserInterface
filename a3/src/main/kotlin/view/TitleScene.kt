@@ -17,7 +17,7 @@ class TitleScene : BorderPane() {
             alignment = Pos.CENTER
             padding = Insets(30.0)
             }
-        bottom = VBox(Text("Implemented by Alan Lee for CS349, University of Waterloo, S23")).apply {
+        bottom = VBox(Text("Implemented by Alan Lee (20935365) for CS349, University of Waterloo, S23")).apply {
             alignment = Pos.CENTER
             padding = Insets(10.0)
         }

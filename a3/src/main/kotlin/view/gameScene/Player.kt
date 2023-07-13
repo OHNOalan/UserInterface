@@ -18,7 +18,6 @@ class Player (val model: Model) : Pane(){
         ship.xProperty().bind(model.Player.value.Position)
         children.add(ship)
         addEventHandler(KeyEvent.KEY_PRESSED) {
-            println("moveLeft called")
             when(it.code){
                 KeyCode.A, KeyCode.LEFT -> model.moveLeft()
                 KeyCode.D, KeyCode.RIGHT ->model.moveRight()
@@ -27,7 +26,6 @@ class Player (val model: Model) : Pane(){
             }
         }
         addEventHandler(KeyEvent.KEY_RELEASED) {
-            println("moveLeft called")
             when(it.code){
                 KeyCode.A, KeyCode.LEFT -> model.stopLeft()
                 KeyCode.D, KeyCode.RIGHT -> model.stopRight()

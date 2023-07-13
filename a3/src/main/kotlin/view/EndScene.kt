@@ -16,7 +16,7 @@ class EndScene(gameScore: Int, win: Boolean) : BorderPane() {
         val endTitle = Text().apply {
             text = when(win){
                 true -> "YOU WIN!"
-                false -> "GAME OVER!"
+                false -> "YOU LOSE!"
             }
             style = "-fx-font-weight: bold;" +
                     "-fx-font-size: 50px;"
@@ -40,6 +40,5 @@ class EndScene(gameScore: Int, win: Boolean) : BorderPane() {
             padding = Insets(0.0,0.0,80.0,0.0)
         }
         center = result
-        println("${result.width} ${result.height}")
     }
 }

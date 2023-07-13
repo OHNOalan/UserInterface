@@ -34,6 +34,9 @@ val enemyImage = arrayOf<Pair<String,String>>(
 )
 val playerImage = Pair("file:src/main/assets/images/player.png","file:src/main/assets/images/player_bullet.png")
 
+const val maxLevel = 3
+const val maxLives = 3
+
 const val shipWidth = 80.0
 const val shipHeight = 48.0
 const val shipMoveSpeed = 3.0
@@ -42,15 +45,15 @@ const val enemyWidth = 60.0
 const val enemyHeight = 40.0
 const val enemySpacing = 5.0
 
-const val enemyInitSpeed = 3.0
-const val enemyLevelIncSpeed = 6.0
-const val enemyAccelerateSpeed = 1.0
+const val enemyInitSpeed = 1.0
+const val enemyLevelIncSpeed = 2.0
+const val enemyAccelerateSpeed = 0.1
 
 const val missileWidth = 15.0
 const val missileHeight = 30.0
 const val missileSpeed = 5.0
 
-const val playerMissileRate = 15
+const val playerMissileRate = 1 //30
 const val enemyMissileRate = 60
 
 const val ENEMY3ROW = 1

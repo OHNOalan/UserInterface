@@ -8,8 +8,9 @@ import shipHeight
 import shipMoveSpeed
 import shipWidth
 import statusBarHeight
+import kotlin.random.Random
 
-class Ship (sceneWidth: Double, sceneHeight: Double) {
+class Ship (val sceneWidth: Double, sceneHeight: Double) {
     private var position = ReadOnlyDoubleWrapper(sceneWidth/2 - shipWidth /2)
     val Position: ReadOnlyDoubleProperty = position.readOnlyProperty
     private val positionY = ReadOnlyDoubleWrapper(sceneHeight - shipHeight - statusBarHeight - 1.5 * enemyHeight)
@@ -24,6 +25,9 @@ class Ship (sceneWidth: Double, sceneHeight: Double) {
     }
     init {
         timer.start()
+    }
+    fun reset() {
+        position.value = Random.nextDouble(0.0,sceneWidth - shipWidth)
     }
     fun moveLeft () {
         right = false

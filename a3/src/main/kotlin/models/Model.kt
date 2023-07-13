@@ -12,6 +12,8 @@ import javafx.animation.AnimationTimer
 import javafx.beans.property.*
 import javafx.collections.FXCollections
 import javafx.scene.media.AudioClip
+import maxLevel
+import maxLives
 import playerMissileRate
 import shootSoundTrack
 
@@ -29,7 +31,7 @@ class Model(
     private var score = ReadOnlyIntegerWrapper(0)
     val Score: ReadOnlyIntegerProperty = score.readOnlyProperty
 
-    private var lives = ReadOnlyIntegerWrapper(3)
+    private var lives = ReadOnlyIntegerWrapper(maxLives)
     val Lives: ReadOnlyIntegerProperty = lives.readOnlyProperty
     
     private val enemyList = ReadOnlyListWrapper(FXCollections.observableList(List(0) { } as List<Enemy> ))
@@ -77,21 +79,23 @@ class Model(
         }
     }
     private fun missileCollision(){
-        enemyMissiles.value.forEach {
-            if(it.collisionDetect()) {
+        enemyMissiles.value.forEach { missile ->
+            if(missile.collisionDetect()) {
                 AudioClip(explosionSoundTrack).play()
-                enemyMissiles.value.remove(it)
+                enemyMissiles.value.remove(missile)
                 lives.value--
+                player.value.reset()
                 if(lives.value == 0) lose()
             }
         }
-        playerMissiles.value.forEach {
-            val enemy = it.collisionDetect()
+        playerMissiles.value.forEach { missile ->
+            val enemy = missile.collisionDetect()
             if(enemy != null) {
                 AudioClip(explosionSoundTrack).play()
-                playerMissiles.value.remove(it)
+                playerMissiles.value.remove(missile)
                 enemyList.value.remove(enemy)
                 score.value += EnemyScore(enemy.type)
+                enemyList.value.forEach { it.accelerate() }
             }
         }
     }
@@ -140,7 +144,16 @@ class Model(
     }
     private fun checkResult() {
         var lose = false
-        if(enemyList.size == 0) win()
+        if(enemyList.size == 0) {
+            if(level.value == maxLevel) win()
+            else {
+                level.value++
+                lives.value = maxLives
+                enemyMissiles.value.clear()
+                playerMissiles.value.clear()
+                initEnemy()
+            }
+        }
         enemyList.forEach { if (it.overlap()) lose = true }
         if(lose) {
             AudioClip(explosionSoundTrack).play()
