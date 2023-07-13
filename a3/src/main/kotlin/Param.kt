@@ -53,7 +53,7 @@ const val missileWidth = 15.0
 const val missileHeight = 30.0
 const val missileSpeed = 5.0
 
-const val playerMissileRate = 1 //30
+const val playerMissileRate = 30
 const val enemyMissileRate = 60
 
 const val ENEMY3ROW = 1
