@@ -1,13 +1,14 @@
 package models
 
 import enemyHeight
+import enemyMissileSpeed
 import enemyWidth
 import javafx.animation.AnimationTimer
 import javafx.beans.property.ReadOnlyDoubleProperty
 import javafx.beans.property.ReadOnlyDoubleWrapper
 import missileHeight
-import missileSpeed
 import missileWidth
+import playerMissileSpeed
 import shipHeight
 import shipWidth
 
@@ -25,7 +26,7 @@ class PlayerMissile(override val model: Model): Missile {
     override val PositionY: ReadOnlyDoubleProperty = positionY.readOnlyProperty
     override val timer: AnimationTimer = object : AnimationTimer() {
         override fun handle(now: Long) {
-            positionY.value -= missileSpeed
+            positionY.value -= playerMissileSpeed
         }
     }
 
@@ -55,7 +56,7 @@ class EnemyMissile(override val model: Model, enemy: Enemy): Missile {
     override val PositionY: ReadOnlyDoubleProperty = positionY.readOnlyProperty
     override val timer: AnimationTimer = object : AnimationTimer() {
         override fun handle(now: Long) {
-            positionY.value += missileSpeed
+            positionY.value += enemyMissileSpeed
         }
     }
     fun collisionDetect(): Boolean{

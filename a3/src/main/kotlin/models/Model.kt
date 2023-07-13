@@ -147,7 +147,6 @@ class Model(
         }
     }
     private fun checkResult() {
-        var lose = false
         if(enemyList.size == 0) {
             if(level.value == maxLevel) win()
             else {
@@ -157,11 +156,13 @@ class Model(
                 playerMissiles.value.clear()
                 initEnemy()
             }
-        }
-        enemyList.forEach { if (it.overlap()) lose = true }
-        if(lose) {
-            AudioClip(explosionSoundTrack).play()
-            lose()
+        } else {
+            var lose = false
+            enemyList.forEach { if (it.overlap()) lose = true }
+            if(lose) {
+                AudioClip(explosionSoundTrack).play()
+                lose()
+            }
         }
     }
     private fun lose(){

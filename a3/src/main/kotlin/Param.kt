@@ -39,7 +39,7 @@ const val maxLives = 3
 
 const val shipWidth = 80.0
 const val shipHeight = 48.0
-const val shipMoveSpeed = 3.0
+const val shipMoveSpeed = 10.0
 
 const val enemyWidth = 60.0
 const val enemyHeight = 40.0
@@ -51,7 +51,8 @@ const val enemyAccelerateSpeed = 0.1
 
 const val missileWidth = 15.0
 const val missileHeight = 30.0
-const val missileSpeed = 5.0
+const val playerMissileSpeed = 10.0
+const val enemyMissileSpeed = 5.0
 
 const val playerMissileRate = 30
 const val enemyMissileRate = 60
