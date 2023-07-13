@@ -79,20 +79,24 @@ class Model(
         }
     }
     private fun missileCollision(){
-        enemyMissiles.value.forEach { missile ->
+        val EMIterator = enemyMissiles.value.iterator()
+        while(EMIterator.hasNext()) {
+            val missile = EMIterator.next()
             if(missile.collisionDetect()) {
                 AudioClip(explosionSoundTrack).play()
-                enemyMissiles.value.remove(missile)
+                EMIterator.remove()
                 lives.value--
                 player.value.reset()
                 if(lives.value == 0) lose()
             }
         }
-        playerMissiles.value.forEach { missile ->
+        val PMIterator = playerMissiles.value.iterator()
+        while(PMIterator.hasNext()) {
+            val missile = PMIterator.next()
             val enemy = missile.collisionDetect()
             if(enemy != null) {
                 AudioClip(explosionSoundTrack).play()
-                playerMissiles.value.remove(missile)
+                PMIterator.remove()
                 enemyList.value.remove(enemy)
                 score.value += EnemyScore(enemy.type)
                 enemyList.value.forEach { it.accelerate() }
