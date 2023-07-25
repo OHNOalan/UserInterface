@@ -37,12 +37,12 @@ class MainActivity : AppCompatActivity() {
     // manage the pages of the PDF, see below
     lateinit var pdfRenderer: PdfRenderer
     lateinit var parcelFileDescriptor: ParcelFileDescriptor
-    var currentPage: PdfRenderer.Page? = null
 
     // custom ImageView class that captures strokes and draws them over the image
     lateinit var pageImage: PDFimage
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d("oncreate","oncreate called")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         pdfViewModel = ViewModelProvider(this, PDFViewModelFactory(resources.displayMetrics.densityDpi))[PDFViewModel::class.java]
@@ -105,13 +105,24 @@ class MainActivity : AppCompatActivity() {
         try {
             openRenderer(this)
             pdfViewModel.newPDF(pdfRenderer)
-            closeRenderer()
+        } catch (exception: IOException) {
+            Log.d(LOGNAME, "Error opening PDF")
+        }
+    }
+
+    override fun onStart() {
+        Log.d("onstart","onstart called")
+        super.onStart()
+        try {
+            openRenderer(this)
+            pdfViewModel.newPDF(pdfRenderer)
         } catch (exception: IOException) {
             Log.d(LOGNAME, "Error opening PDF")
         }
     }
 
     override fun onStop() {
+        Log.d("onstop","onstop called")
         super.onStop()
         try {
             closeRenderer()
@@ -143,7 +154,6 @@ class MainActivity : AppCompatActivity() {
         pdfRenderer = PdfRenderer(parcelFileDescriptor)
     }
 
-    // do this before you quit!
     @Throws(IOException::class)
     private fun closeRenderer() {
         pdfViewModel.closeRenderer()

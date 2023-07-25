@@ -9,8 +9,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.pdfreader.model.Brush
 import com.example.pdfreader.model.Model
-import com.example.pdfreader.util.Stack
 import androidx.lifecycle.ViewModelProvider
+import java.util.*
 
 class PDFViewModelFactory(private val resolution: Int) : ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
@@ -37,7 +37,6 @@ class PDFViewModel(resolution: Int) : ViewModel() {
         model.edit.observeForever {
             // need to update paths
             _edit.value = it
-            Log.d("viewmodelPathNUM", "${__paths.size()} pdfpaths")
         }
         model.pageNum.observeForever {
             // need to update paths
@@ -56,12 +55,6 @@ class PDFViewModel(resolution: Int) : ViewModel() {
         }
     }
     fun closeRenderer() { model.closeRenderer() }
-    fun addPath(path: Path?) {
-        if (path != null) {
-            model.addPath(path)
-            Log.d("addPath", "path added")
-        }
-    }
     fun changeBrush(brush: Brush) {
         model.changeBrush(brush)
     }
@@ -69,20 +62,22 @@ class PDFViewModel(resolution: Int) : ViewModel() {
     fun redo() { model.redo() }
     fun lastPage() { model.lastPage() }
     fun nextPage() { model.nextPage() }
-    fun clean() { model.clean() }
     fun newPDF(pdfRenderer: PdfRenderer) { model.newPDF(pdfRenderer) }
     fun edit() { model.edit() }
-
+    fun addPath(path: Path?) {
+        if (path != null) model.addPath(path)
+    }
     private fun updatePaths(stack: Stack<Pair<Int,Pair<Brush,Path>>>) {
         __paths.clear()
         val paths = stack.filter{ it.first == model.pageNum.value }
-        while (!paths.isEmpty()) {
-            val element = paths.pop()!!
+        val iter = paths.iterator()
+        while (iter.hasNext()) {
+            val element = iter.next()
             if(element.second.first == Brush.ERASE) {
-                val iterator = stack.iterator()
+                val iterator = __paths.iterator()
                 while (iterator.hasNext()) {
                     val item = iterator.next()
-                    if (isPathIntersect(item.second.second,element.second.second)) {
+                    if (isPathIntersect(item.second,element.second.second)) {
                         iterator.remove() // Remove the item from the stack
                     }
                 }
@@ -91,7 +86,6 @@ class PDFViewModel(resolution: Int) : ViewModel() {
             }
         }
         _paths.postValue(_paths.value)
-        Log.d("viewmodelPathNUM", "${__paths.size()} pdfpaths")
     }
 
     private fun isPathIntersect(path1: Path, path2: Path): Boolean {

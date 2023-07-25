@@ -6,7 +6,7 @@ import android.graphics.pdf.PdfRenderer
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.pdfreader.util.Stack
+import java.util.*
 
 class Model(private val resolution: Int) {
     // interface
@@ -23,7 +23,7 @@ class Model(private val resolution: Int) {
     val bitmap : LiveData<Bitmap?> get() { return _bitmap }
     private val _pdfpaths = Stack<Pair<Int, Pair<Brush,Path>>>()
     private val _pdfPaths = MutableLiveData(_pdfpaths)
-    val pdfPaths : LiveData<Stack<Pair<Int,Pair<Brush,Path>>>> get() { return _pdfPaths }
+    val pdfPaths : LiveData<Stack<Pair<Int, Pair<Brush, Path>>>> get() { return _pdfPaths }
 
     // private variable
     private var pdfRenderer : PdfRenderer? = null
@@ -45,6 +45,7 @@ class Model(private val resolution: Int) {
 
     // bitmap need to be listened
     private fun updateBitMap() {
+        Log.d("updatebit","close page")
         currentPage?.close()
         currentPage = pdfRenderer?.openPage(pageNum.value!!)
         if (currentPage != null) {
@@ -55,38 +56,46 @@ class Model(private val resolution: Int) {
     }
 
     fun closeRenderer(){
+        Log.d("closeRender","close page")
         currentPage?.close()
+        currentPage = null
         pdfRenderer?.close()
     }
 
     fun addPath(path: Path) {
+        Log.d("modelPathNUM", "${_pdfpaths.size} pdfpaths in model")
         _pdfpaths.push(Pair(_pageNum.value!!,Pair(__brush,path)))
+        Log.d("modelPathNUM", "${_pdfpaths.size} pdfpaths in model")
         pathRedoStack.clear()
+        Log.d("modelPathNUM", "${_pdfpaths.size} pdfpaths in model")
         _pdfPaths.postValue(_pdfPaths.value)
-//        Log.d("modelPathNUM", "path in page ${_pageNum.value!!} is added")
-//        Log.d("modelPathNUM", "${pdfPaths.value!!.size()} paths in total")
+        Log.d("modelPathNUM", "${_pdfpaths.size} paths in total")
     }
     fun undo() {
-        val path = _pdfpaths.pop()
-        if (path != null) {
-            pathRedoStack.push(path)
-            if(_pageNum.value != path.first) {
-                _pageNum.value = path.first
-                updateBitMap()
-            }
+        if(!_pdfpaths.isEmpty()) {
+            val path = _pdfpaths.pop()
+            if (path != null) {
+                pathRedoStack.push(path)
+                if(_pageNum.value != path.first) {
+                    _pageNum.value = path.first
+                    updateBitMap()
+                }
 
+            }
+            _pdfPaths.postValue(_pdfPaths.value)
         }
-        _pdfPaths.postValue(_pdfPaths.value)
     }
 
     fun redo() {
-        val path = pathRedoStack.pop()
-        if (path != null) {
-            _pdfpaths.push(path)
-            _pageNum.value = path.first
-            updateBitMap()
+        if(!pathRedoStack.isEmpty()) {
+            val path = pathRedoStack.pop()
+            if (path != null) {
+                _pdfpaths.push(path)
+                _pageNum.value = path.first
+                updateBitMap()
+            }
+            _pdfPaths.postValue(_pdfPaths.value)
         }
-        _pdfPaths.postValue(_pdfPaths.value)
     }
     fun changeBrush(brush: Brush) {
         __brush = brush
