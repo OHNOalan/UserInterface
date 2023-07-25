@@ -1,13 +1,23 @@
 package com.example.pdfreader
 
 import android.content.Context
-import android.graphics.Bitmap
+import android.graphics.Color
+import android.graphics.Paint
 import android.graphics.pdf.PdfRenderer
 import android.os.Bundle
 import android.os.ParcelFileDescriptor
 import android.util.Log
-import android.widget.LinearLayout
+import android.view.MotionEvent
+import android.widget.Button
+import android.widget.ImageButton
+import android.widget.ScrollView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
+import com.example.pdfreader.model.Brush
+import com.example.pdfreader.util.CustomScrollView
+import com.example.pdfreader.viewModel.PDFViewModel
+import com.example.pdfreader.viewModel.PDFViewModelFactory
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -17,6 +27,9 @@ import java.io.IOException
 // Issues about cache etc. are not at all obvious from documentation, so we should expect people to need this.
 // We may wish to provide this code.
 class MainActivity : AppCompatActivity() {
+
+    lateinit var pdfViewModel : PDFViewModel;
+
     val LOGNAME = "pdf_viewer"
     val FILENAME = "shannon1948.pdf"
     val FILERESID = R.raw.shannon1948
@@ -32,19 +45,66 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val layout = findViewById<LinearLayout>(R.id.pdfLayout)
-        layout.isEnabled = true
+        pdfViewModel = ViewModelProvider(this, PDFViewModelFactory(resources.displayMetrics.densityDpi))[PDFViewModel::class.java]
 
-        pageImage = PDFimage(this)
+        val layout = findViewById<CustomScrollView>(R.id.pdfLayout)
+        layout.isEnabled = true
+        layout.pdfViewModel = pdfViewModel
+        pageImage = PDFimage(this,pdfViewModel)
         layout.addView(pageImage)
-        pageImage.minimumWidth = 1000
-        pageImage.minimumHeight = 2000
+
+        val fileName = findViewById<TextView>(R.id.filename)
+        val pageNum = findViewById<TextView>(R.id.pageNum)
+
+        fileName.text = FILENAME
+        pdfViewModel.pageNum.observeForever { pageNum.text = it }
+
+        val draw = findViewById<ImageButton>(R.id.draw)
+        val highlight = findViewById<ImageButton>(R.id.highlight)
+        val erase = findViewById<ImageButton>(R.id.erase)
+        val undo = findViewById<ImageButton>(R.id.undo)
+        val redo = findViewById<ImageButton>(R.id.redo)
+        val last = findViewById<Button>(R.id.prev)
+        val next = findViewById<Button>(R.id.next)
+        val edit = findViewById<Button>(R.id.edit)
+
+        draw.setOnClickListener { pdfViewModel.changeBrush(Brush.DRAW) }
+        highlight.setOnClickListener { pdfViewModel.changeBrush(Brush.HIGHLIGHT) }
+        erase.setOnClickListener { pdfViewModel.changeBrush(Brush.ERASE) }
+        undo.setOnClickListener { pdfViewModel.undo() }
+        redo.setOnClickListener { pdfViewModel.redo() }
+        last.setOnClickListener { pdfViewModel.lastPage() }
+        next.setOnClickListener { pdfViewModel.nextPage() }
+        edit.setOnClickListener { pdfViewModel.edit() }
+
+        pdfViewModel.edit.observeForever {
+            when(it) {
+                true -> {
+                    draw.isEnabled = true
+                    highlight.isEnabled = true
+                    erase.isEnabled = true
+                    undo.isEnabled = true
+                    redo.isEnabled = true
+                    layout.isScrollEnabled = false
+                    edit.text = "view"
+                }
+                false -> {
+                    draw.isEnabled = false
+                    highlight.isEnabled = false
+                    erase.isEnabled = false
+                    undo.isEnabled = false
+                    redo.isEnabled = false
+                    layout.isScrollEnabled = true
+                    edit.text = "edit"
+                }
+            }
+        }
 
         // open page 0 of the PDF
         // it will be displayed as an image in the pageImage (above)
         try {
             openRenderer(this)
-            showPage(0)
+            pdfViewModel.newPDF(pdfRenderer)
             closeRenderer()
         } catch (exception: IOException) {
             Log.d(LOGNAME, "Error opening PDF")
@@ -78,7 +138,6 @@ class MainActivity : AppCompatActivity() {
             output.close()
         }
         parcelFileDescriptor = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
-
         // capture PDF data
         // all this just to get a handle to the actual PDF representation
         pdfRenderer = PdfRenderer(parcelFileDescriptor)
@@ -87,32 +146,7 @@ class MainActivity : AppCompatActivity() {
     // do this before you quit!
     @Throws(IOException::class)
     private fun closeRenderer() {
-        currentPage?.close()
-        pdfRenderer.close()
+        pdfViewModel.closeRenderer()
         parcelFileDescriptor.close()
-    }
-
-    private fun showPage(index: Int) {
-        if (pdfRenderer.pageCount <= index) {
-            return
-        }
-        // Close the current page before opening another one.
-        currentPage?.close()
-
-        // Use `openPage` to open a specific page in PDF.
-        currentPage = pdfRenderer.openPage(index)
-
-        if (currentPage != null) {
-            // Important: the destination bitmap must be ARGB (not RGB).
-            val bitmap = Bitmap.createBitmap(currentPage!!.getWidth(), currentPage!!.getHeight(), Bitmap.Config.ARGB_8888)
-
-            // Here, we render the page onto the Bitmap.
-            // To render a portion of the page, use the second and third parameter. Pass nulls to get the default result.
-            // Pass either RENDER_MODE_FOR_DISPLAY or RENDER_MODE_FOR_PRINT for the last parameter.
-            currentPage!!.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
-
-            // Display the page
-            pageImage.setImage(bitmap)
-        }
     }
 }

@@ -6,51 +6,40 @@ import android.graphics.*
 import android.util.Log
 import android.view.MotionEvent
 import android.widget.ImageView
+import com.example.pdfreader.model.Brush
+import com.example.pdfreader.viewModel.BrushPaint
+import com.example.pdfreader.viewModel.PDFViewModel
 
 @SuppressLint("AppCompatCustomView")
 class PDFimage  // constructor
-    (context: Context?) : ImageView(context) {
+    (context: Context?, val pdfViewModel: PDFViewModel) : ImageView(context) {
     val LOGNAME = "pdf_image"
 
     // drawing path
     var path: Path? = null
-    var paths = mutableListOf<Path?>()
+    var paths = mutableListOf<Pair<Brush,Path>>()
 
     // image to display
     var bitmap: Bitmap? = null
     var paint = Paint(Color.BLUE)
 
-    // capture touch events (down/move/up) to create a path
-    // and use that to create a stroke that we can draw
-    @SuppressLint("ClickableViewAccessibility")
-    override fun onTouchEvent(event: MotionEvent): Boolean {
-        when (event.action) {
-            MotionEvent.ACTION_DOWN -> {
-                Log.d(LOGNAME, "Action down")
-                path = Path()
-                path!!.moveTo(event.x, event.y)
-            }
-
-            MotionEvent.ACTION_MOVE -> {
-                Log.d(LOGNAME, "Action move")
-                path!!.lineTo(event.x, event.y)
-            }
-
-            MotionEvent.ACTION_UP -> {
-                Log.d(LOGNAME, "Action up")
-                paths.add(path)
+    init {
+        pdfViewModel.bitmap.observeForever {
+            bitmap = it
+        }
+        pdfViewModel.paths.observeForever {
+            paths.clear()
+            while(!it.isEmpty()) {
+                paths.add(it.pop()!!)
             }
         }
-        return true
+    }
+    @SuppressLint("ClickableViewAccessibility")
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        // drawing is apply on scrollview
+        return false
     }
 
-    // set image as background
-    fun setImage(bitmap: Bitmap?) {
-        this.bitmap = bitmap
-    }
-
-    // set brush characteristics
-    // e.g. color, thickness, alpha
     fun setBrush(paint: Paint) {
         this.paint = paint
     }
@@ -60,10 +49,27 @@ class PDFimage  // constructor
         if (bitmap != null) {
             setImageBitmap(bitmap)
         }
+//        Log.d("PathNUM", "${paths.size} paths in total")
         // draw lines over it
         for (path in paths) {
-            path?.let { canvas.drawPath(it, paint) }
+            when (path.first) {
+                Brush.DRAW -> {
+                    paint = BrushPaint.DRAW.paint
+                    canvas.drawPath(path.second, paint)
+                }
+                Brush.HIGHLIGHT -> {
+                    paint = BrushPaint.HIGHLIGHT.paint
+                    canvas.drawPath(path.second, paint)
+                }
+                else -> Unit
+            }
         }
         super.onDraw(canvas)
+    }
+    init {
+        minimumWidth = 2000
+        minimumHeight = 2000
+        paint.style = Paint.Style.STROKE
+        paint.strokeWidth = 5f
     }
 }
