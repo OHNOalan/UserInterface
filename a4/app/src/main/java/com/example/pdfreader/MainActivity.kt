@@ -1,21 +1,17 @@
 package com.example.pdfreader
 
 import android.content.Context
-import android.graphics.Color
-import android.graphics.Paint
 import android.graphics.pdf.PdfRenderer
 import android.os.Bundle
 import android.os.ParcelFileDescriptor
 import android.util.Log
-import android.view.MotionEvent
 import android.widget.Button
 import android.widget.ImageButton
-import android.widget.ScrollView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.pdfreader.model.Brush
-import com.example.pdfreader.util.CustomScrollView
+import com.example.pdfreader.util.CustomLinearView
 import com.example.pdfreader.viewModel.PDFViewModel
 import com.example.pdfreader.viewModel.PDFViewModelFactory
 import java.io.File
@@ -44,7 +40,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         pdfViewModel = ViewModelProvider(this, PDFViewModelFactory(resources.displayMetrics.densityDpi))[PDFViewModel::class.java]
 
-        val layout = findViewById<CustomScrollView>(R.id.pdfLayout)
+        val layout = findViewById<CustomLinearView>(R.id.pdfLayout)
         layout.isEnabled = true
         layout.pdfViewModel = pdfViewModel
         pageImage = PDFimage(this)
@@ -54,7 +50,7 @@ class MainActivity : AppCompatActivity() {
         val pageNum = findViewById<TextView>(R.id.pageNum)
 
         fileName.text = FILENAME
-        pdfViewModel.pageNum.observeForever { pageNum.text = it }
+        pdfViewModel.pageNum.observe(this) { pageNum.text = it }
 
         val draw = findViewById<ImageButton>(R.id.draw)
         val highlight = findViewById<ImageButton>(R.id.highlight)
@@ -74,7 +70,7 @@ class MainActivity : AppCompatActivity() {
         next.setOnClickListener { pdfViewModel.nextPage() }
         edit.setOnClickListener { pdfViewModel.edit() }
 
-        pdfViewModel.edit.observeForever {
+        pdfViewModel.edit.observe(this) {
             if(it) {
                 draw.isEnabled = true; draw.alpha = 1.0f;
                 highlight.isEnabled = true; highlight.alpha = 1.0f;
@@ -106,6 +102,16 @@ class MainActivity : AppCompatActivity() {
         super.onStop()
         try {
             closeRenderer()
+            findViewById<ImageButton>(R.id.draw).setOnClickListener(null)
+            findViewById<ImageButton>(R.id.highlight).setOnClickListener(null)
+            findViewById<ImageButton>(R.id.erase).setOnClickListener(null)
+            findViewById<ImageButton>(R.id.undo).setOnClickListener(null)
+            findViewById<ImageButton>(R.id.redo).setOnClickListener(null)
+            findViewById<Button>(R.id.prev).setOnClickListener(null)
+            findViewById<Button>(R.id.next).setOnClickListener(null)
+            findViewById<Button>(R.id.edit).setOnClickListener(null)
+
+
         } catch (ex: IOException) {
             Log.d(LOGNAME, "Unable to close PDF renderer")
         }
