@@ -76,20 +76,20 @@ class MainActivity : AppCompatActivity() {
 
         pdfViewModel.edit.observeForever {
             if(it) {
-                draw.isEnabled = true
-                highlight.isEnabled = true
-                erase.isEnabled = true
-                undo.isEnabled = true
-                redo.isEnabled = true
-                layout.isScrollEnabled = false
+                draw.isEnabled = true; draw.alpha = 1.0f;
+                highlight.isEnabled = true; highlight.alpha = 1.0f;
+                erase.isEnabled = true; erase.alpha = 1.0f;
+                undo.isEnabled = true; undo.alpha = 1.0f;
+                redo.isEnabled = true; redo.alpha = 1.0f;
+                layout.isScrollEnabled = false;
                 edit.text = "view"
             } else {
-                draw.isEnabled = false
-                highlight.isEnabled = false
-                erase.isEnabled = false
-                undo.isEnabled = false
-                redo.isEnabled = false
-                layout.isScrollEnabled = true
+                draw.isEnabled = false; draw.alpha = 0.5f;
+                highlight.isEnabled = false; highlight.alpha = 0.5f;
+                erase.isEnabled = false; erase.alpha = 0.5f;
+                undo.isEnabled = false; undo.alpha = 0.5f;
+                redo.isEnabled = false; redo.alpha = 0.5f;
+                layout.isScrollEnabled = true;
                 edit.text = "edit"
             }
         }
