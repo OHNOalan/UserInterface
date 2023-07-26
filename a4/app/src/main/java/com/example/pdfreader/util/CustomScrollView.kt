@@ -6,6 +6,7 @@ import android.graphics.Path
 import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
+import android.widget.LinearLayout
 import android.widget.ScrollView
 import com.example.pdfreader.viewModel.PDFViewModel
 
@@ -13,7 +14,7 @@ class CustomScrollView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0
-) : ScrollView(context, attrs, defStyle) {
+) : LinearLayout(context, attrs, defStyle) {
     private var path: Path? = null
     var isScrollEnabled = true
     var pdfViewModel: PDFViewModel? = null
@@ -39,40 +40,38 @@ class CustomScrollView @JvmOverloads constructor(
     var inverse = Matrix()
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        when(event.pointerCount) {
-            1 -> {
-                if (isScrollEnabled) {
-                    return super.onTouchEvent(event)
-                } else {
-                    val matrix = FloatArray(9)
-                    currentMatrix.getValues(matrix)
+        return when(event.pointerCount) {
+            1 -> if (isScrollEnabled) true else draw(event) // super.onTouchEvent(event)
+            2 -> if(isScrollEnabled) panZoom(event) else true
+            else -> return true
+        }
+    }
+    private fun draw(event: MotionEvent) : Boolean {
+        val matrix = FloatArray(9)
+        currentMatrix.getValues(matrix)
 
-                    val tx = matrix[Matrix.MTRANS_X]
-                    val ty = matrix[Matrix.MTRANS_Y]
-                    val sx = matrix[Matrix.MSCALE_X]
-                    val sy = matrix[Matrix.MSCALE_Y]
+        val tx = matrix[Matrix.MTRANS_X]
+        val ty = matrix[Matrix.MTRANS_Y]
+        val sx = matrix[Matrix.MSCALE_X]
+        val sy = matrix[Matrix.MSCALE_Y]
 
-                    when (event.action) {
-                        MotionEvent.ACTION_DOWN -> {
-                            path = Path()
-                            path?.moveTo((scrollX + event.x - tx) / sx, (scrollY + event.y - ty) / sy)
-                            pdfViewModel?.setPath(path!!)
-                        }
-
-                        MotionEvent.ACTION_MOVE -> {
-                            path?.lineTo((scrollX + event.x - tx) / sx, (scrollY + event.y - ty) / sy)
-                            pdfViewModel?.setPath(path!!)
-                        }
-
-                        MotionEvent.ACTION_UP -> {
-                            pdfViewModel?.setPath(null)
-                            pdfViewModel?.addPath(path)
-                            path = null
-                        }
-                    }
-                }
+        when (event.action) {
+            MotionEvent.ACTION_DOWN -> {
+                path = Path()
+                path?.moveTo((scrollX + event.x - tx) / sx, (scrollY + event.y - ty) / sy)
+                pdfViewModel?.setPath(path!!)
             }
-            2 -> panZoom(event)
+
+            MotionEvent.ACTION_MOVE -> {
+                path?.lineTo((scrollX + event.x - tx) / sx, (scrollY + event.y - ty) / sy)
+                pdfViewModel?.setPath(path!!)
+            }
+
+            MotionEvent.ACTION_UP -> {
+                pdfViewModel?.setPath(null)
+                pdfViewModel?.addPath(path)
+                path = null
+            }
         }
         return true
     }

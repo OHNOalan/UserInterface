@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.*
 import android.util.Log
 import android.view.MotionEvent
+import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -42,7 +43,7 @@ class PDFimage (context: Context?) : ImageView(context) {
     }
     private fun setupObserver() {
         Log.d("Observer","Set Up")
-        pdfViewModel.edit.observeForever(editObserver)
+//        pdfViewModel.edit.observeForever(editObserver)
         pdfViewModel.transformation.observeForever(transformationObserver)
         pdfViewModel.path.observeForever(pathObserver)
         pdfViewModel.brush.observeForever(brushObserver)
@@ -52,6 +53,10 @@ class PDFimage (context: Context?) : ImageView(context) {
 
     override fun onAttachedToWindow() {
         Log.d("Attach","Attach Window")
+        post {
+            layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
+            layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
+        }
         super.onAttachedToWindow()
         setupObserver()
     }
@@ -59,7 +64,7 @@ class PDFimage (context: Context?) : ImageView(context) {
     override fun onDetachedFromWindow() {
         Log.d("Detach","Detach Window")
         super.onDetachedFromWindow()
-        pdfViewModel.edit.removeObserver(editObserver)
+//        pdfViewModel.edit.removeObserver(editObserver)
         pdfViewModel.transformation.removeObserver(transformationObserver)
         pdfViewModel.path.removeObserver(pathObserver)
         pdfViewModel.brush.removeObserver(brushObserver)
@@ -95,7 +100,11 @@ class PDFimage (context: Context?) : ImageView(context) {
         super.onDraw(canvas)
     }
     init {
-        minimumWidth = 1000
-        minimumHeight = 2000
+        post {
+            layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
+            layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
+        }
+//        minimumWidth = 1000
+//        minimumHeight = 2000
     }
 }
