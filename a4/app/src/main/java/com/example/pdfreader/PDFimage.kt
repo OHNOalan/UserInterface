@@ -12,15 +12,11 @@ import com.example.pdfreader.viewModel.PDFViewModel
 
 @SuppressLint("AppCompatCustomView", "ViewConstructor")
 class PDFimage (context: Context?, pdfViewModel: PDFViewModel) : ImageView(context) {
-
     private var paths = mutableListOf<Pair<Brush,Path>>()
-
     private var bitmap: Bitmap? = null
     private var brush = Brush.DRAW
     private var path : Path? = null
-
     var transformMatrix = Matrix()
-
     init {
         pdfViewModel.bitmap.observeForever { bitmap = it }
         pdfViewModel.paths.observeForever {
@@ -29,29 +25,16 @@ class PDFimage (context: Context?, pdfViewModel: PDFViewModel) : ImageView(conte
                 paths.add(it.pop()!!)
             }
         }
-        pdfViewModel.transformation.observeForever {
-            transformMatrix = it
-        }
-        pdfViewModel.brush.observeForever {
-            Log.d("PDF", "Brush update")
-            brush = it
-        }
-        pdfViewModel.path.observeForever {
-            path = it
-        }
+        pdfViewModel.transformation.observeForever { transformMatrix = it }
+        pdfViewModel.path.observeForever { path = it }
+        pdfViewModel.brush.observeForever { brush = it }
     }
     @SuppressLint("ClickableViewAccessibility")
-    override fun onTouchEvent(event: MotionEvent): Boolean {
-        return false
-    }
+    override fun onTouchEvent(event: MotionEvent): Boolean { return false }
 
     override fun onDraw(canvas: Canvas) {
         canvas.concat(transformMatrix)
-        // draw background
-        if (bitmap != null) {
-            setImageBitmap(bitmap)
-        }
-        // draw lines over it
+        if (bitmap != null) setImageBitmap(bitmap)
         for (path in paths) {
             when (path.first) {
                 Brush.DRAW -> {

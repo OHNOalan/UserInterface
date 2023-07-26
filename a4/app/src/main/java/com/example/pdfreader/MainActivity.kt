@@ -34,11 +34,9 @@ class MainActivity : AppCompatActivity() {
     val FILENAME = "shannon1948.pdf"
     val FILERESID = R.raw.shannon1948
 
-    // manage the pages of the PDF, see below
     lateinit var pdfRenderer: PdfRenderer
     lateinit var parcelFileDescriptor: ParcelFileDescriptor
 
-    // custom ImageView class that captures strokes and draws them over the image
     lateinit var pageImage: PDFimage
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -77,30 +75,25 @@ class MainActivity : AppCompatActivity() {
         edit.setOnClickListener { pdfViewModel.edit() }
 
         pdfViewModel.edit.observeForever {
-            when(it) {
-                true -> {
-                    draw.isEnabled = true
-                    highlight.isEnabled = true
-                    erase.isEnabled = true
-                    undo.isEnabled = true
-                    redo.isEnabled = true
-                    layout.isScrollEnabled = false
-                    edit.text = "view"
-                }
-                false -> {
-                    draw.isEnabled = false
-                    highlight.isEnabled = false
-                    erase.isEnabled = false
-                    undo.isEnabled = false
-                    redo.isEnabled = false
-                    layout.isScrollEnabled = true
-                    edit.text = "edit"
-                }
+            if(it) {
+                draw.isEnabled = true
+                highlight.isEnabled = true
+                erase.isEnabled = true
+                undo.isEnabled = true
+                redo.isEnabled = true
+                layout.isScrollEnabled = false
+                edit.text = "view"
+            } else {
+                draw.isEnabled = false
+                highlight.isEnabled = false
+                erase.isEnabled = false
+                undo.isEnabled = false
+                redo.isEnabled = false
+                layout.isScrollEnabled = true
+                edit.text = "edit"
             }
         }
 
-        // open page 0 of the PDF
-        // it will be displayed as an image in the pageImage (above)
         try {
             openRenderer(this)
             pdfViewModel.newPDF(pdfRenderer)
@@ -109,15 +102,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        try {
-            openRenderer(this)
-            pdfViewModel.newPDF(pdfRenderer)
-        } catch (exception: IOException) {
-            Log.d(LOGNAME, "Error opening PDF")
-        }
-    }
+//    override fun onStart() {
+//        super.onStart()
+//        try {
+//            openRenderer(this)
+//            pdfViewModel.newPDF(pdfRenderer)
+//        } catch (exception: IOException) {
+//            Log.d(LOGNAME, "Error opening PDF")
+//        }
+//    }
 
     override fun onStop() {
         super.onStop()
@@ -130,11 +123,8 @@ class MainActivity : AppCompatActivity() {
 
     @Throws(IOException::class)
     private fun openRenderer(context: Context) {
-        // In this sample, we read a PDF from the assets directory.
         val file = File(context.cacheDir, FILENAME)
         if (!file.exists()) {
-            // pdfRenderer cannot handle the resource directly,
-            // so extract it into the local cache directory.
             val asset = this.resources.openRawResource(FILERESID)
             val output = FileOutputStream(file)
             val buffer = ByteArray(1024)
@@ -146,8 +136,6 @@ class MainActivity : AppCompatActivity() {
             output.close()
         }
         parcelFileDescriptor = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
-        // capture PDF data
-        // all this just to get a handle to the actual PDF representation
         pdfRenderer = PdfRenderer(parcelFileDescriptor)
     }
 

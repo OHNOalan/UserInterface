@@ -45,27 +45,15 @@ class PDFViewModel(resolution: Int) : ViewModel() {
     val brush : LiveData<Brush> get() { return _brush }
 
     init {
-        model.edit.observeForever {
-            // need to update paths
-            _edit.value = it
-        }
-        model.pageNum.observeForever {
-            // need to update paths
-            _pageNum.value = "Page ${it+1}/${model.totalPageNum.value}"
-        }
-        model.totalPageNum.observeForever {
-            // need to update paths
-            _pageNum.value = "Page ${model.pageNum}/${it}"
-        }
-        model.pdfPaths.observeForever { stack ->
-            updatePaths(stack)
-        }
+        model.edit.observeForever { _edit.value = it }
+        model.pageNum.observeForever { _pageNum.value = "Page ${it+1}/${model.totalPageNum.value}" }
+        model.totalPageNum.observeForever { _pageNum.value = "Page ${model.pageNum}/${it}" }
+        model.pdfPaths.observeForever { updatePaths(it) }
         model.bitmap.observeForever {bitmap ->
             _bitmap.value = bitmap
             updatePaths(model.pdfPaths.value!!)
         }
         model.brush.observeForever {
-            Log.d("ViewModel", "Brush update")
             __brush = it
             _brush.postValue(__brush)
         }
@@ -88,9 +76,7 @@ class PDFViewModel(resolution: Int) : ViewModel() {
     fun nextPage() { model.nextPage() }
     fun newPDF(pdfRenderer: PdfRenderer) { model.newPDF(pdfRenderer) }
     fun edit() { model.edit() }
-    fun addPath(path: Path?) {
-        if (path != null) model.addPath(path)
-    }
+    fun addPath(path: Path?) { if (path != null) model.addPath(path) }
     private fun updatePaths(stack: Stack<Pair<Int,Pair<Brush,Path>>>) {
         __paths.clear()
         val paths = stack.filter{ it.first == model.pageNum.value }
@@ -105,9 +91,7 @@ class PDFViewModel(resolution: Int) : ViewModel() {
                         iterator.remove() // Remove the item from the stack
                     }
                 }
-            } else {
-                __paths.push(element?.second!!)
-            }
+            } else __paths.push(element?.second!!)
         }
         _paths.postValue(__paths)
     }

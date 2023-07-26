@@ -3,7 +3,6 @@ package com.example.pdfreader.model
 import android.graphics.Bitmap
 import android.graphics.Path
 import android.graphics.pdf.PdfRenderer
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import java.util.*
@@ -69,11 +68,7 @@ class Model(private val resolution: Int) {
             val path = _pdfpaths.pop()
             if (path != null) {
                 pathRedoStack.push(path)
-                if(_pageNum.value != path.first) {
-                    _pageNum.value = path.first
-                    updateBitMap()
-                }
-
+                updateBitMap()
             }
             _pdfPaths.postValue(_pdfpaths)
         }
@@ -94,9 +89,7 @@ class Model(private val resolution: Int) {
         __brush = brush
         _brush.postValue(__brush)
     }
-    fun edit() {
-        _edit.value = !_edit.value!!
-    }
+    fun edit() { _edit.value = !_edit.value!! }
 
     fun newPDF(pdfRenderer: PdfRenderer) {
         this.pdfRenderer = pdfRenderer
