@@ -39,14 +39,11 @@ class CustomScrollView @JvmOverloads constructor(
     var inverse = Matrix()
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        if (isScrollEnabled) {
-            return when(event.pointerCount) {
-                2 -> panZoom(event)
-                else -> super.onTouchEvent(event)
-            }
-        } else {
-            when(event.pointerCount) {
-                1 -> {
+        when(event.pointerCount) {
+            1 -> {
+                if (isScrollEnabled) {
+                    return super.onTouchEvent(event)
+                } else {
                     val matrix = FloatArray(9)
                     currentMatrix.getValues(matrix)
 
@@ -58,12 +55,12 @@ class CustomScrollView @JvmOverloads constructor(
                     when (event.action) {
                         MotionEvent.ACTION_DOWN -> {
                             path = Path()
-                            path?.moveTo((scrollX + event.x - tx) / sx,(scrollY + event.y - ty) / sy)
+                            path?.moveTo((scrollX + event.x - tx) / sx, (scrollY + event.y - ty) / sy)
                             pdfViewModel?.setPath(path!!)
                         }
 
                         MotionEvent.ACTION_MOVE -> {
-                            path?.lineTo((scrollX + event.x - tx) / sx,(scrollY + event.y - ty) / sy)
+                            path?.lineTo((scrollX + event.x - tx) / sx, (scrollY + event.y - ty) / sy)
                             pdfViewModel?.setPath(path!!)
                         }
 
@@ -74,10 +71,10 @@ class CustomScrollView @JvmOverloads constructor(
                         }
                     }
                 }
-                2 -> panZoom(event)
             }
-            return true
+            2 -> panZoom(event)
         }
+        return true
     }
     private fun panZoom(event: MotionEvent) : Boolean {
         path = null

@@ -4,8 +4,6 @@ import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.graphics.Path
 import android.graphics.pdf.PdfRenderer
-import android.util.Log
-import androidx.core.graphics.values
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -27,8 +25,10 @@ class PDFViewModel(resolution: Int) : ViewModel() {
 
     private var _edit = MutableLiveData(false)
     val edit : LiveData<Boolean> get() { return _edit }
-    private val _pageNum = MutableLiveData<String>()
+    private val _pageNum = MutableLiveData<String>("page 0/0")
     val pageNum : LiveData<String> get() { return _pageNum }
+    private val _pNum = MutableLiveData<Int>(0)
+    val pNum : LiveData<Int> get() { return _pNum }
     private val _bitmap = MutableLiveData<Bitmap?>()
     val bitmap : LiveData<Bitmap?> get() { return _bitmap }
     private val __paths = Stack<Pair<Brush,Path>>()
@@ -46,7 +46,10 @@ class PDFViewModel(resolution: Int) : ViewModel() {
 
     init {
         model.edit.observeForever { _edit.value = it }
-        model.pageNum.observeForever { _pageNum.value = "Page ${it+1}/${model.totalPageNum.value}" }
+        model.pageNum.observeForever {
+            _pageNum.value = "Page ${it+1}/${model.totalPageNum.value}"
+            _pNum.value = it
+        }
         model.totalPageNum.observeForever { _pageNum.value = "Page ${model.pageNum}/${it}" }
         model.pdfPaths.observeForever { updatePaths(it) }
         model.bitmap.observeForever {bitmap ->
@@ -74,6 +77,7 @@ class PDFViewModel(resolution: Int) : ViewModel() {
     fun redo() { model.redo() }
     fun lastPage() { model.lastPage() }
     fun nextPage() { model.nextPage() }
+    fun setPage(index: Int) { model.setPage(index) }
     fun newPDF(pdfRenderer: PdfRenderer) { model.newPDF(pdfRenderer) }
     fun edit() { model.edit() }
     fun addPath(path: Path?) { if (path != null) model.addPath(path) }

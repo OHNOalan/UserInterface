@@ -47,7 +47,7 @@ class MainActivity : AppCompatActivity() {
         val layout = findViewById<CustomScrollView>(R.id.pdfLayout)
         layout.isEnabled = true
         layout.pdfViewModel = pdfViewModel
-        pageImage = PDFimage(this,pdfViewModel)
+        pageImage = PDFimage(this)
         layout.addView(pageImage)
 
         val fileName = findViewById<TextView>(R.id.filename)
@@ -109,6 +109,26 @@ class MainActivity : AppCompatActivity() {
         } catch (ex: IOException) {
             Log.d(LOGNAME, "Unable to close PDF renderer")
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        if(pdfViewModel != null) {
+            outState?.run {
+                // putInt("Edit", if (pdfViewModel!!.edit.value == true) {1} else {0})
+                putInt("PageNum", pdfViewModel!!.pNum.value?:0)
+            }
+        }
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        if (savedInstanceState != null) {
+            with(savedInstanceState) {
+                // if(getInt("Edit") == 1) pdfViewModel.edit()
+                pdfViewModel.setPage(getInt("PageNum"))
+            }
+        }
+        super.onRestoreInstanceState(savedInstanceState)
     }
 
     @Throws(IOException::class)
