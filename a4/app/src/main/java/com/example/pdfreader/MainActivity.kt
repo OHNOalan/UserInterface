@@ -42,7 +42,6 @@ class MainActivity : AppCompatActivity() {
     lateinit var pageImage: PDFimage
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        Log.d("oncreate","oncreate called")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         pdfViewModel = ViewModelProvider(this, PDFViewModelFactory(resources.displayMetrics.densityDpi))[PDFViewModel::class.java]
@@ -111,7 +110,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onStart() {
-        Log.d("onstart","onstart called")
         super.onStart()
         try {
             openRenderer(this)
@@ -122,7 +120,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onStop() {
-        Log.d("onstop","onstop called")
         super.onStop()
         try {
             closeRenderer()

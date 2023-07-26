@@ -45,7 +45,6 @@ class Model(private val resolution: Int) {
 
     // bitmap need to be listened
     private fun updateBitMap() {
-        Log.d("updatebit","close page")
         currentPage?.close()
         currentPage = pdfRenderer?.openPage(pageNum.value!!)
         if (currentPage != null) {
@@ -56,7 +55,6 @@ class Model(private val resolution: Int) {
     }
 
     fun closeRenderer(){
-        Log.d("closeRender","close page")
         currentPage?.close()
         currentPage = null
         pdfRenderer?.close()
@@ -94,6 +92,7 @@ class Model(private val resolution: Int) {
     }
     fun changeBrush(brush: Brush) {
         __brush = brush
+        _brush.postValue(__brush)
     }
     fun edit() {
         _edit.value = !_edit.value!!

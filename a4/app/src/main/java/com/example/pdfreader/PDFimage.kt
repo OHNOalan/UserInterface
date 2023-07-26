@@ -16,7 +16,8 @@ class PDFimage (context: Context?, pdfViewModel: PDFViewModel) : ImageView(conte
     private var paths = mutableListOf<Pair<Brush,Path>>()
 
     private var bitmap: Bitmap? = null
-    private var paint = Paint(Color.BLUE)
+    private var brush = Brush.DRAW
+    private var path : Path? = null
 
     var transformMatrix = Matrix()
 
@@ -31,6 +32,13 @@ class PDFimage (context: Context?, pdfViewModel: PDFViewModel) : ImageView(conte
         pdfViewModel.transformation.observeForever {
             transformMatrix = it
         }
+        pdfViewModel.brush.observeForever {
+            Log.d("PDF", "Brush update")
+            brush = it
+        }
+        pdfViewModel.path.observeForever {
+            path = it
+        }
     }
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -38,7 +46,6 @@ class PDFimage (context: Context?, pdfViewModel: PDFViewModel) : ImageView(conte
     }
 
     override fun onDraw(canvas: Canvas) {
-        Log.d("PDFImage", "${transformMatrix}")
         canvas.concat(transformMatrix)
         // draw background
         if (bitmap != null) {
@@ -48,13 +55,20 @@ class PDFimage (context: Context?, pdfViewModel: PDFViewModel) : ImageView(conte
         for (path in paths) {
             when (path.first) {
                 Brush.DRAW -> {
-                    paint = BrushPaint.DRAW.paint
+                    val paint = BrushPaint.DRAW.paint
                     canvas.drawPath(path.second, paint)
                 }
                 Brush.HIGHLIGHT -> {
-                    paint = BrushPaint.HIGHLIGHT.paint
+                    val paint = BrushPaint.HIGHLIGHT.paint
                     canvas.drawPath(path.second, paint)
                 }
+                else -> Unit
+            }
+        }
+        if(path != null) {
+            when(brush) {
+                Brush.DRAW -> canvas.drawPath(path!!, BrushPaint.DRAW.paint)
+                Brush.HIGHLIGHT -> canvas.drawPath(path!!, BrushPaint.HIGHLIGHT.paint)
                 else -> Unit
             }
         }

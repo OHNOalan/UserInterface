@@ -37,6 +37,12 @@ class PDFViewModel(resolution: Int) : ViewModel() {
     private var __transformation = Matrix()
     private var _transformation = MutableLiveData(__transformation)
     val transformation : LiveData<Matrix> get() { return _transformation }
+    private var __path : Path? = null
+    private var _path = MutableLiveData(__path)
+    val path : LiveData<Path?> get() { return _path }
+    private var __brush = Brush.DRAW
+    private var _brush = MutableLiveData(__brush)
+    val brush : LiveData<Brush> get() { return _brush }
 
     init {
         model.edit.observeForever {
@@ -58,10 +64,19 @@ class PDFViewModel(resolution: Int) : ViewModel() {
             _bitmap.value = bitmap
             updatePaths(model.pdfPaths.value!!)
         }
+        model.brush.observeForever {
+            Log.d("ViewModel", "Brush update")
+            __brush = it
+            _brush.postValue(__brush)
+        }
     }
     fun setTransform(matrix: Matrix) {
         __transformation = matrix
         _transformation.postValue(__transformation)
+    }
+    fun setPath(path: Path?) {
+        __path = path
+        _path.postValue(__path)
     }
     fun closeRenderer() { model.closeRenderer() }
     fun changeBrush(brush: Brush) {

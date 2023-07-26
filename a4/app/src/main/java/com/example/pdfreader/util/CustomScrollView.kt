@@ -102,18 +102,15 @@ class CustomScrollView : ScrollView {
 
                     // pan and zoom during MOVE event
                     if (event.action == MotionEvent.ACTION_MOVE) {
-                        Log.d(LOGNAME, "Multitouch move")
                         // pan == translate of midpoint
                         val dx = mid_x - old_mid_x
                         val dy = mid_y - old_mid_y
                         currentMatrix.preTranslate(dx, dy)
-                        Log.d(LOGNAME, "translate: $dx,$dy")
 
                         // zoom == change of spread between p1 and p2
                         var scale = d / d_old
                         scale = Math.max(0f, scale)
                         currentMatrix.preScale(scale, scale, mid_x, mid_y)
-                        Log.d(LOGNAME, "scale: $scale")
 
                         // reset on up
                     } else if (event.action == MotionEvent.ACTION_UP) {
@@ -143,14 +140,18 @@ class CustomScrollView : ScrollView {
                 MotionEvent.ACTION_DOWN -> {
                     path = Path()
                     path?.moveTo(scrollX + (event.x - tx) / sx, scrollY + (event.y - ty) / sy)
+                    pdfViewModel?.setPath(path!!)
                 }
 
                 MotionEvent.ACTION_MOVE -> {
                     path?.lineTo(scrollX + (event.x - tx) / sx, scrollY + (event.y - ty) / sy)
+                    pdfViewModel?.setPath(path!!)
                 }
 
                 MotionEvent.ACTION_UP -> {
+                    pdfViewModel?.setPath(null)
                     pdfViewModel?.addPath(path)
+                    path = null
                 }
             }
             return true
