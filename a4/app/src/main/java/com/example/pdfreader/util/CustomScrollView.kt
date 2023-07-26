@@ -4,10 +4,8 @@ import android.content.Context
 import android.graphics.Matrix
 import android.graphics.Path
 import android.util.AttributeSet
-import android.util.Log
 import android.view.MotionEvent
 import android.widget.LinearLayout
-import android.widget.ScrollView
 import com.example.pdfreader.viewModel.PDFViewModel
 
 class CustomLinearView @JvmOverloads constructor(
