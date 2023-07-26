@@ -1,9 +1,11 @@
 package com.example.pdfreader.viewModel
 
 import android.graphics.Bitmap
+import android.graphics.Matrix
 import android.graphics.Path
 import android.graphics.pdf.PdfRenderer
 import android.util.Log
+import androidx.core.graphics.values
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -32,6 +34,9 @@ class PDFViewModel(resolution: Int) : ViewModel() {
     private val __paths = Stack<Pair<Brush,Path>>()
     private val _paths = MutableLiveData(__paths)
     val paths : LiveData<Stack<Pair<Brush,Path>>> get() { return _paths }
+    private var __transformation = Matrix()
+    private var _transformation = MutableLiveData(__transformation)
+    val transformation : LiveData<Matrix> get() { return _transformation }
 
     init {
         model.edit.observeForever {
@@ -53,6 +58,10 @@ class PDFViewModel(resolution: Int) : ViewModel() {
             _bitmap.value = bitmap
             updatePaths(model.pdfPaths.value!!)
         }
+    }
+    fun setTransform(matrix: Matrix) {
+        __transformation = matrix
+        _transformation.postValue(__transformation)
     }
     fun closeRenderer() { model.closeRenderer() }
     fun changeBrush(brush: Brush) {
@@ -85,7 +94,7 @@ class PDFViewModel(resolution: Int) : ViewModel() {
                 __paths.push(element?.second!!)
             }
         }
-        _paths.postValue(_paths.value)
+        _paths.postValue(__paths)
     }
 
     private fun isPathIntersect(path1: Path, path2: Path): Boolean {

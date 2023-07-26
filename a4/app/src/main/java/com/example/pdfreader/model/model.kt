@@ -61,15 +61,10 @@ class Model(private val resolution: Int) {
         currentPage = null
         pdfRenderer?.close()
     }
-
     fun addPath(path: Path) {
-        Log.d("modelPathNUM", "${_pdfpaths.size} pdfpaths in model")
         _pdfpaths.push(Pair(_pageNum.value!!,Pair(__brush,path)))
-        Log.d("modelPathNUM", "${_pdfpaths.size} pdfpaths in model")
         pathRedoStack.clear()
-        Log.d("modelPathNUM", "${_pdfpaths.size} pdfpaths in model")
-        _pdfPaths.postValue(_pdfPaths.value)
-        Log.d("modelPathNUM", "${_pdfpaths.size} paths in total")
+        _pdfPaths.postValue(_pdfpaths)
     }
     fun undo() {
         if(!_pdfpaths.isEmpty()) {
@@ -82,7 +77,7 @@ class Model(private val resolution: Int) {
                 }
 
             }
-            _pdfPaths.postValue(_pdfPaths.value)
+            _pdfPaths.postValue(_pdfpaths)
         }
     }
 
@@ -94,17 +89,11 @@ class Model(private val resolution: Int) {
                 _pageNum.value = path.first
                 updateBitMap()
             }
-            _pdfPaths.postValue(_pdfPaths.value)
+            _pdfPaths.postValue(_pdfpaths)
         }
     }
     fun changeBrush(brush: Brush) {
         __brush = brush
-    }
-
-    fun clean() {
-        _pdfpaths.clear()
-        pathRedoStack.clear()
-        _pdfPaths.postValue(_pdfPaths.value)
     }
     fun edit() {
         _edit.value = !_edit.value!!
