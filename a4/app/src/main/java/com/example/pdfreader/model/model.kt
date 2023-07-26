@@ -50,20 +50,23 @@ class Model(private val resolution: Int) {
 
     // bitmap need to be listened
     private fun updateBitMap() {
-        val currentPage = pdfRenderer!!.openPage(pageNum.value!!)
-        if (currentPage != null) {
-            val bitmap = Bitmap.createBitmap( resolution * currentPage.width / 72, resolution * currentPage.height / 72, Bitmap.Config.ARGB_8888)
+        if(pdfRenderer != null) {
+            val currentPage = pdfRenderer!!.openPage(pageNum.value!!)
+            if (currentPage != null) {
+                val bitmap = Bitmap.createBitmap( resolution * currentPage.width / 72, resolution * currentPage.height / 72, Bitmap.Config.ARGB_8888)
 //            val bitmap = Bitmap.createBitmap( currentPage.width, currentPage.height, Bitmap.Config.ARGB_8888)
-            currentPage!!.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
-            _bitmap.value = bitmap
+                currentPage!!.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+                _bitmap.value = bitmap
+            }
+            currentPage.close()
         }
-        currentPage.close()
     }
 
     fun closeRenderer(){
         currentPage?.close()
         currentPage = null
         pdfRenderer?.close()
+        pdfRenderer = null
     }
     fun addPath(path: Path) {
         _pdfpaths.push(Pair(_pageNum.value!!,Pair(__brush,path)))

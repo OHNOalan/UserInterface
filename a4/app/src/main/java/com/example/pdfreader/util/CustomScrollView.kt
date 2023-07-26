@@ -10,7 +10,7 @@ import android.widget.LinearLayout
 import android.widget.ScrollView
 import com.example.pdfreader.viewModel.PDFViewModel
 
-class CustomScrollView @JvmOverloads constructor(
+class CustomLinearView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0
