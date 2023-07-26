@@ -102,16 +102,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-//    override fun onStart() {
-//        super.onStart()
-//        try {
-//            openRenderer(this)
-//            pdfViewModel.newPDF(pdfRenderer)
-//        } catch (exception: IOException) {
-//            Log.d(LOGNAME, "Error opening PDF")
-//        }
-//    }
-
     override fun onStop() {
         super.onStop()
         try {
