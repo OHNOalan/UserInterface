@@ -11,7 +11,6 @@
         android:id="@+id/topbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/pdfLayout">
         <TextView
@@ -75,15 +74,16 @@
         </RadioGroup>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <com.example.pdfreader.util.CustomLinearView
+    <LinearLayout
         android:id="@+id/pdfLayout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:orientation="vertical"
+        android:gravity="center"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/topbar"
-        app:layout_constraintBottom_toTopOf="@id/bottombar"/>
+        app:layout_constraintBottom_toTopOf="@+id/bottombar"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottombar"
