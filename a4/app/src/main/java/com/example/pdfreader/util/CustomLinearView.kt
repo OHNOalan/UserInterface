@@ -56,12 +56,12 @@ class CustomLinearView @JvmOverloads constructor(
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
                 path = Path()
-                path?.moveTo((scrollX + event.x - tx) / sx, (scrollY + event.y - ty) / sy)
+                path?.moveTo((event.x - tx) / sx, (event.y - ty) / sy)
                 pdfViewModel?.setPath(path!!)
             }
 
             MotionEvent.ACTION_MOVE -> {
-                path?.lineTo((scrollX + event.x - tx) / sx, (scrollY + event.y - ty) / sy)
+                path?.lineTo((event.x - tx) / sx, (event.y - ty) / sy)
                 pdfViewModel?.setPath(path!!)
             }
 

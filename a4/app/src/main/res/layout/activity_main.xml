@@ -3,19 +3,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/viewButton"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
-
-    <com.example.pdfreader.util.CustomLinearView
-        android:id="@+id/pdfLayout"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/bottombar"
-        app:layout_constraintTop_toBottomOf="@+id/topbar"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/topbar"
@@ -24,7 +14,6 @@
         android:orientation="horizontal"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/pdfLayout">
-
         <TextView
             android:id="@+id/filename"
             android:layout_width="wrap_content"
@@ -34,7 +23,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
         <ImageButton
             android:id="@+id/undo"
             android:layout_width="48dp"
@@ -44,7 +32,6 @@
             app:layout_constraintEnd_toStartOf="@id/redo"
             app:layout_constraintTop_toTopOf="parent"
             android:contentDescription="redo"/>
-
         <ImageButton
             android:id="@+id/redo"
             android:layout_width="48dp"
@@ -54,7 +41,6 @@
             app:layout_constraintEnd_toStartOf="@id/tools"
             app:layout_constraintTop_toTopOf="parent"
             android:contentDescription="undo"/>
-
         <RadioGroup
             android:id="@+id/tools"
             android:layout_width="wrap_content"
@@ -87,8 +73,17 @@
                 android:contentDescription="erase" />
 
         </RadioGroup>
-
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.example.pdfreader.util.CustomLinearView
+        android:id="@+id/pdfLayout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/topbar"
+        app:layout_constraintBottom_toTopOf="@id/bottombar"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottombar"
@@ -96,8 +91,6 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/pdfLayout"
         app:layout_constraintBottom_toBottomOf="parent">
-
-
         <Button
             android:id="@+id/prev"
             android:layout_width="wrap_content"
@@ -107,7 +100,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/edit"/>
-
         <Button
             android:id="@+id/edit"
             android:layout_width="wrap_content"
@@ -117,7 +109,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/prev"
             app:layout_constraintEnd_toStartOf="@+id/next"/>
-
         <Button
             android:id="@+id/next"
             android:layout_width="wrap_content"
@@ -127,7 +118,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/edit"
             app:layout_constraintEnd_toEndOf="@+id/pageNum"/>
-
         <TextView
             android:id="@+id/pageNum"
             android:layout_width="wrap_content"
