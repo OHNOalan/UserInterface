@@ -98,8 +98,27 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onStop() {
-        super.onStop()
+//    override fun onStop() {
+//        super.onStop()
+//        try {
+//            closeRenderer()
+//            findViewById<ImageButton>(R.id.draw).setOnClickListener(null)
+//            findViewById<ImageButton>(R.id.highlight).setOnClickListener(null)
+//            findViewById<ImageButton>(R.id.erase).setOnClickListener(null)
+//            findViewById<ImageButton>(R.id.undo).setOnClickListener(null)
+//            findViewById<ImageButton>(R.id.redo).setOnClickListener(null)
+//            findViewById<Button>(R.id.prev).setOnClickListener(null)
+//            findViewById<Button>(R.id.next).setOnClickListener(null)
+//            findViewById<Button>(R.id.edit).setOnClickListener(null)
+//
+//
+//        } catch (ex: IOException) {
+//            Log.d(LOGNAME, "Unable to close PDF renderer")
+//        }
+//    }
+
+    override fun onDestroy() {
+        super.onDestroy()
         try {
             closeRenderer()
             findViewById<ImageButton>(R.id.draw).setOnClickListener(null)
