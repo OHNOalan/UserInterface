@@ -54,8 +54,8 @@ class Model(private val resolution: Int) {
             val currentPage = pdfRenderer!!.openPage(pageNum.value!!)
             if (currentPage != null) {
                 val bitmap = Bitmap.createBitmap( resolution * currentPage.width / 72, resolution * currentPage.height / 72, Bitmap.Config.ARGB_8888)
-//            val bitmap = Bitmap.createBitmap( currentPage.width, currentPage.height, Bitmap.Config.ARGB_8888)
-                currentPage!!.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+//                val bitmap = Bitmap.createBitmap( currentPage.width, currentPage.height, Bitmap.Config.ARGB_8888)
+                currentPage.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
                 _bitmap.value = bitmap
             }
             currentPage.close()

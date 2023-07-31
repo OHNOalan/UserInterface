@@ -7,11 +7,11 @@ import android.os.ParcelFileDescriptor
 import android.util.Log
 import android.widget.Button
 import android.widget.ImageButton
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.pdfreader.model.Brush
-import com.example.pdfreader.util.CustomLinearView
 import com.example.pdfreader.viewModel.PDFViewModel
 import com.example.pdfreader.viewModel.PDFViewModelFactory
 import java.io.File
@@ -24,7 +24,7 @@ import java.io.IOException
 // We may wish to provide this code.
 class MainActivity : AppCompatActivity() {
 
-    lateinit var pdfViewModel : PDFViewModel;
+    lateinit var pdfViewModel : PDFViewModel
 
     val LOGNAME = "pdf_viewer"
     val FILENAME = "shannon1948.pdf"
@@ -40,9 +40,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         pdfViewModel = ViewModelProvider(this, PDFViewModelFactory(resources.displayMetrics.densityDpi))[PDFViewModel::class.java]
 
-        val layout = findViewById<CustomLinearView>(R.id.pdfLayout)
+        val layout = findViewById<LinearLayout>(R.id.pdfLayout)
         layout.isEnabled = true
-        layout.pdfViewModel = pdfViewModel
         pageImage = PDFimage(this)
         layout.addView(pageImage)
 
@@ -72,20 +71,20 @@ class MainActivity : AppCompatActivity() {
 
         pdfViewModel.edit.observe(this) {
             if(it) {
-                draw.isEnabled = true; draw.alpha = 1.0f;
-                highlight.isEnabled = true; highlight.alpha = 1.0f;
-                erase.isEnabled = true; erase.alpha = 1.0f;
-                undo.isEnabled = true; undo.alpha = 1.0f;
-                redo.isEnabled = true; redo.alpha = 1.0f;
-                layout.isScrollEnabled = false;
+                draw.isEnabled = true; draw.alpha = 1.0f
+                highlight.isEnabled = true; highlight.alpha = 1.0f
+                erase.isEnabled = true; erase.alpha = 1.0f
+                undo.isEnabled = true; undo.alpha = 1.0f
+                redo.isEnabled = true; redo.alpha = 1.0f
+                pageImage.isScrollEnabled = false
                 edit.text = "view"
             } else {
-                draw.isEnabled = false; draw.alpha = 0.5f;
-                highlight.isEnabled = false; highlight.alpha = 0.5f;
-                erase.isEnabled = false; erase.alpha = 0.5f;
-                undo.isEnabled = false; undo.alpha = 0.5f;
-                redo.isEnabled = false; redo.alpha = 0.5f;
-                layout.isScrollEnabled = true;
+                draw.isEnabled = false; draw.alpha = 0.5f
+                highlight.isEnabled = false; highlight.alpha = 0.5f
+                erase.isEnabled = false; erase.alpha = 0.5f
+                undo.isEnabled = false; undo.alpha = 0.5f
+                redo.isEnabled = false; redo.alpha = 0.5f
+                pageImage.isScrollEnabled = true
                 edit.text = "edit"
             }
         }
@@ -137,21 +136,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        if(pdfViewModel != null) {
-            outState?.run {
-                // putInt("Edit", if (pdfViewModel!!.edit.value == true) {1} else {0})
-                putInt("PageNum", pdfViewModel!!.pNum.value?:0)
-            }
+        outState.run {
+            putInt("PageNum", pdfViewModel.pNum.value?:0)
         }
         super.onSaveInstanceState(outState)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        if (savedInstanceState != null) {
-            with(savedInstanceState) {
-                // if(getInt("Edit") == 1) pdfViewModel.edit()
-                pdfViewModel.setPage(getInt("PageNum"))
-            }
+        with(savedInstanceState) {
+            // if(getInt("Edit") == 1) pdfViewModel.edit()
+            pdfViewModel.setPage(getInt("PageNum"))
         }
         super.onRestoreInstanceState(savedInstanceState)
     }
