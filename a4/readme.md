@@ -1,3 +1,6 @@
+Usage:
+Two Status: View State (PanZoom) / Edit State (Drawing)
+
 Images: <br/>
 <a href="https://www.flaticon.com/free-icons/pencil" title="pencil icons">Pencil icons created by Freepik - Flaticon</a> <br/>
 <a href="https://www.flaticon.com/free-icons/underline" title="underline icons">Underline icons created by Freepik - Flaticon</a> <br/>
