@@ -1,7 +1,6 @@
 package com.example.pdfreader.viewModel
 
 import android.graphics.Bitmap
-import android.graphics.Matrix
 import android.graphics.Path
 import android.graphics.pdf.PdfRenderer
 import androidx.lifecycle.LiveData
@@ -34,12 +33,6 @@ class PDFViewModel(resolution: Int) : ViewModel() {
     private val __paths = Stack<Pair<Brush,Path>>()
     private val _paths = MutableLiveData(__paths)
     val paths : LiveData<Stack<Pair<Brush,Path>>> get() { return _paths }
-    private var __transformation = Matrix()
-    private var _transformation = MutableLiveData(__transformation)
-    val transformation : LiveData<Matrix> get() { return _transformation }
-    private var __path : Path? = null
-    private var _path = MutableLiveData(__path)
-    val path : LiveData<Path?> get() { return _path }
     private var __brush = Brush.DRAW
     private var _brush = MutableLiveData(__brush)
     val brush : LiveData<Brush> get() { return _brush }
@@ -60,14 +53,6 @@ class PDFViewModel(resolution: Int) : ViewModel() {
             __brush = it
             _brush.postValue(__brush)
         }
-    }
-    fun setTransform(matrix: Matrix) {
-        __transformation = matrix
-        _transformation.postValue(__transformation)
-    }
-    fun setPath(path: Path?) {
-        __path = path
-        _path.postValue(__path)
     }
     fun closeRenderer() { model.closeRenderer() }
     fun changeBrush(brush: Brush) {

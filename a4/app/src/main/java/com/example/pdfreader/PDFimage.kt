@@ -2,12 +2,8 @@ package com.example.pdfreader
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.res.Configuration
 import android.graphics.*
-import android.graphics.drawable.GradientDrawable.Orientation
-import android.util.Log
 import android.view.MotionEvent
-import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -166,15 +162,11 @@ class PDFimage (context: Context?) : ImageView(context) {
             MotionEvent.ACTION_DOWN -> {
                 path = Path()
                 path?.moveTo((event.x - tx) / sx, (event.y - ty) / sy)
-//                pdfViewModel.setPath(path!!)
             }
             MotionEvent.ACTION_MOVE -> {
                 path?.lineTo((event.x - tx) / sx, (event.y - ty) / sy)
-//                pdfViewModel.setPath(path!!)
             }
             MotionEvent.ACTION_UP -> {
-//                pdfViewModel.setPath(null)
-                Log.d("PDFviewSize", "width: ${width} height: ${height} bitwidth: ${drawable.intrinsicWidth} bitheight: ${drawable.intrinsicHeight}")
                 var w: Float
                 var h: Float
                 if(height/drawable.intrinsicHeight <= width/drawable.intrinsicWidth) {
@@ -228,15 +220,15 @@ class PDFimage (context: Context?) : ImageView(context) {
                 else -> Unit
             }
         }
-        canvas.drawCircle(marginX,marginY,10F,BrushPaint.DRAW.paint)
-        var testPath = Path()
-        testPath.moveTo(marginX,marginY)
-        testPath.lineTo(marginX+0.1F*w,marginY+0.1F*h)
-        canvas.drawPath(testPath,BrushPaint.DRAW.paint)
-        testPath = inverseTranslatePath(testPath, -marginX,-marginY, 1/sx,1/sy)
-        canvas.drawPath(testPath,BrushPaint.DRAW.paint)
-        testPath = translatePath(testPath, marginX,marginY, sx,sy)
-        canvas.drawPath(testPath,BrushPaint.DRAW.paint)
+//        canvas.drawCircle(marginX,marginY,10F,BrushPaint.DRAW.paint)
+//        var testPath = Path()
+//        testPath.moveTo(marginX,marginY)
+//        testPath.lineTo(marginX+0.1F*w,marginY+0.1F*h)
+//        canvas.drawPath(testPath,BrushPaint.DRAW.paint)
+//        testPath = inverseTranslatePath(testPath, -marginX,-marginY, 1/sx,1/sy)
+//        canvas.drawPath(testPath,BrushPaint.DRAW.paint)
+//        testPath = translatePath(testPath, marginX,marginY, sx,sy)
+//        canvas.drawPath(testPath,BrushPaint.DRAW.paint)
 
         if(path != null) {
             when(brush) {
