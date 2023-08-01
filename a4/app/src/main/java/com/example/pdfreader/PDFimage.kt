@@ -225,9 +225,9 @@ class PDFimage (context: Context?) : ImageView(context) {
 //        testPath.moveTo(marginX,marginY)
 //        testPath.lineTo(marginX+0.1F*w,marginY+0.1F*h)
 //        canvas.drawPath(testPath,BrushPaint.DRAW.paint)
-//        testPath = inverseTranslatePath(testPath, -marginX,-marginY, 1/sx,1/sy)
+//        testPath = inverseTranslatePath(testPath, 0.1F*w,0F, 0.5F*w,0.5F*h)
 //        canvas.drawPath(testPath,BrushPaint.DRAW.paint)
-//        testPath = translatePath(testPath, marginX,marginY, sx,sy)
+//        testPath = translatePath(testPath, -0.1F*w,0F, 1/(0.5F*w),1/(0.5F*h))
 //        canvas.drawPath(testPath,BrushPaint.DRAW.paint)
 
         if(path != null) {
@@ -241,16 +241,16 @@ class PDFimage (context: Context?) : ImageView(context) {
     }
     fun translatePath(path: Path, dx: Float, dy: Float, sx: Float, sy: Float): Path {
         val matrix = Matrix()
-        matrix.setScale(sx, sy)
-        matrix.setTranslate(dx, dy)
+        matrix.preTranslate(dx, dy)
+        matrix.preScale(sx, sy)
         val translatedPath = Path()
         path.transform(matrix, translatedPath)
         return translatedPath
     }
     fun inverseTranslatePath(path: Path, dx: Float, dy: Float, sx: Float, sy: Float): Path {
         val matrix = Matrix()
-        matrix.setScale(sx, sy)
-        matrix.setTranslate(dx, dy)
+        matrix.preScale(sx, sy)
+        matrix.preTranslate(dx, dy)
         val translatedPath = Path()
         path.transform(matrix, translatedPath)
         return translatedPath
