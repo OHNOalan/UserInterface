@@ -51,6 +51,10 @@ class PDFimage (context: Context?) : ImageView(context) {
     var inverse = Matrix()
 
     init {
+        when(resources.configuration.orientation) {
+//            Configuration.ORIENTATION_PORTRAIT -> scaleType = ScaleType.FIT_CENTER
+//            Configuration.ORIENTATION_LANDSCAPE -> scaleType = ScaleType.FIT_CENTER
+        }
         minimumWidth = 1000
         minimumHeight = 2000
         setupObserver()
