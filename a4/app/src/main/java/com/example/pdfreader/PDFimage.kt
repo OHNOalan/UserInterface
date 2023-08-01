@@ -4,7 +4,10 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration
 import android.graphics.*
+import android.graphics.drawable.GradientDrawable.Orientation
+import android.util.Log
 import android.view.MotionEvent
+import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -50,17 +53,25 @@ class PDFimage (context: Context?) : ImageView(context) {
 
     var transformMatrix = Matrix()
     var inverse = Matrix()
+
+    init {
+        when(resources.configuration.orientation) {
+//            Configuration.ORIENTATION_PORTRAIT -> scaleType = ScaleType.FIT_CENTER
+//            Configuration.ORIENTATION_LANDSCAPE -> scaleType = ScaleType.FIT_CENTER
+        }
+        minimumWidth = 1000
+        minimumHeight = 2000
+        setupObserver()
+    }
     private fun setupObserver() {
         pdfViewModel.brush.observeForever(brushObserver)
         pdfViewModel.bitmap.observeForever(bitmapObserver)
         pdfViewModel.paths.observeForever(pathsObserver)
     }
-
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         setupObserver()
     }
-
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         pdfViewModel.brush.removeObserver(brushObserver)
@@ -74,33 +85,6 @@ class PDFimage (context: Context?) : ImageView(context) {
             2 -> if(isScrollEnabled) panZoom(event) else true
             else -> return true
         }
-    }
-    private fun draw(event: MotionEvent) : Boolean {
-        val matrix = FloatArray(9)
-        transformMatrix.getValues(matrix)
-
-        val tx = matrix[Matrix.MTRANS_X]
-        val ty = matrix[Matrix.MTRANS_Y]
-        val sx = matrix[Matrix.MSCALE_X]
-        val sy = matrix[Matrix.MSCALE_Y]
-
-        when (event.action) {
-            MotionEvent.ACTION_DOWN -> {
-                path = Path()
-                path?.moveTo((event.x - tx) / sx, (event.y - ty) / sy)
-                pdfViewModel.setPath(path!!)
-            }
-            MotionEvent.ACTION_MOVE -> {
-                path?.lineTo((event.x - tx) / sx, (event.y - ty) / sy)
-                pdfViewModel.setPath(path!!)
-            }
-            MotionEvent.ACTION_UP -> {
-                pdfViewModel.setPath(null)
-                pdfViewModel.addPath(path)
-                path = null
-            }
-        }
-        return true
     }
     private fun panZoom(event: MotionEvent) : Boolean {
         path = null
@@ -167,13 +151,71 @@ class PDFimage (context: Context?) : ImageView(context) {
             old_mid_x = -1f
             old_mid_y = -1f
         }
-//        pdfViewModel?.setTransform(currentMatrix)
+        return true
+    }
+    private fun draw(event: MotionEvent) : Boolean {
+        val matrix = FloatArray(9)
+        transformMatrix.getValues(matrix)
+
+        val tx = matrix[Matrix.MTRANS_X]
+        val ty = matrix[Matrix.MTRANS_Y]
+        val sx = matrix[Matrix.MSCALE_X]
+        val sy = matrix[Matrix.MSCALE_Y]
+
+        when (event.action) {
+            MotionEvent.ACTION_DOWN -> {
+                path = Path()
+                path?.moveTo((event.x - tx) / sx, (event.y - ty) / sy)
+//                pdfViewModel.setPath(path!!)
+            }
+            MotionEvent.ACTION_MOVE -> {
+                path?.lineTo((event.x - tx) / sx, (event.y - ty) / sy)
+//                pdfViewModel.setPath(path!!)
+            }
+            MotionEvent.ACTION_UP -> {
+//                pdfViewModel.setPath(null)
+                Log.d("PDFviewSize", "width: ${width} height: ${height} bitwidth: ${drawable.intrinsicWidth} bitheight: ${drawable.intrinsicHeight}")
+                var w: Float
+                var h: Float
+                if(height/drawable.intrinsicHeight <= width/drawable.intrinsicWidth) {
+                    w = drawable.intrinsicWidth * height/drawable.intrinsicHeight.toFloat()
+                    h = height.toFloat()
+                } else {
+                    w = width.toFloat()
+                    h = drawable.intrinsicHeight * width/drawable.intrinsicWidth.toFloat()
+                }
+                val marginX = (width-w)/2
+                val marginY = (height-h)/2
+                val sx = 1 / w
+                val sy = 1 / h
+                if(path != null) path = inverseTranslatePath(path!!,-marginX,-marginY,sx,sy)
+                pdfViewModel.addPath(path)
+                path = null
+            }
+        }
         return true
     }
     override fun onDraw(canvas: Canvas) {
         canvas.concat(transformMatrix)
         if (bitmap != null) setImageBitmap(bitmap)
+        var w: Float
+        var h: Float
+        if(height/drawable.intrinsicHeight <= width/drawable.intrinsicWidth) {
+            w = drawable.intrinsicWidth * height/drawable.intrinsicHeight.toFloat()
+            h = height.toFloat()
+        } else {
+            w = width.toFloat()
+            h = drawable.intrinsicHeight * width/drawable.intrinsicWidth.toFloat()
+        }
+        val marginX = (width-w)/2
+        val marginY = (height-h)/2
+        val sx = w
+        val sy = h
         for (path in paths) {
+            var path = path
+//            Log.d("PDFDrawPath", "marginX: ${marginX} marginY: ${marginY} scaleX: ${sx} scaleY: ${sy}\"")
+            if(path != null) path = Pair(path.first,
+                translatePath(path!!.second,marginX,marginY,sx,sy))
             when (path.first) {
                 Brush.DRAW -> {
                     val paint = BrushPaint.DRAW.paint
@@ -186,6 +228,16 @@ class PDFimage (context: Context?) : ImageView(context) {
                 else -> Unit
             }
         }
+        canvas.drawCircle(marginX,marginY,10F,BrushPaint.DRAW.paint)
+        var testPath = Path()
+        testPath.moveTo(marginX,marginY)
+        testPath.lineTo(marginX+0.1F*w,marginY+0.1F*h)
+        canvas.drawPath(testPath,BrushPaint.DRAW.paint)
+        testPath = inverseTranslatePath(testPath, -marginX,-marginY, 1/sx,1/sy)
+        canvas.drawPath(testPath,BrushPaint.DRAW.paint)
+        testPath = translatePath(testPath, marginX,marginY, sx,sy)
+        canvas.drawPath(testPath,BrushPaint.DRAW.paint)
+
         if(path != null) {
             when(brush) {
                 Brush.DRAW -> canvas.drawPath(path!!, BrushPaint.DRAW.paint)
@@ -195,26 +247,20 @@ class PDFimage (context: Context?) : ImageView(context) {
         }
         super.onDraw(canvas)
     }
-    init {
-        when(resources.configuration.orientation) {
-            Configuration.ORIENTATION_PORTRAIT -> scaleType = ScaleType.CENTER_INSIDE
-            Configuration.ORIENTATION_LANDSCAPE -> scaleType = ScaleType.CENTER_CROP
-        }
-//        post {
-//            when(resources.configuration.orientation) {
-//                Configuration.ORIENTATION_PORTRAIT -> {
-//                    layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
-//                    layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
-//                }
-//                Configuration.ORIENTATION_LANDSCAPE -> {
-//                    layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
-//                }
-//            }
-//        }
-        minimumWidth = 1000
-        minimumHeight = 2000
-
-        setupObserver()
-//        transformMatrix = Matrix()
+    fun translatePath(path: Path, dx: Float, dy: Float, sx: Float, sy: Float): Path {
+        val matrix = Matrix()
+        matrix.setScale(sx, sy)
+        matrix.setTranslate(dx, dy)
+        val translatedPath = Path()
+        path.transform(matrix, translatedPath)
+        return translatedPath
+    }
+    fun inverseTranslatePath(path: Path, dx: Float, dy: Float, sx: Float, sy: Float): Path {
+        val matrix = Matrix()
+        matrix.setScale(sx, sy)
+        matrix.setTranslate(dx, dy)
+        val translatedPath = Path()
+        path.transform(matrix, translatedPath)
+        return translatedPath
     }
 }
