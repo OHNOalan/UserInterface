@@ -1,7 +1,7 @@
-Alan Lee
-a372lee
-kotlinc-jvm 1.8.20 (jre 18.0.2)
-macOS Ventura 13.2
+Alan Lee <br/>
+a372lee <br/>
+kotlinc-jvm 1.8.20 (jre 18.0.2) <br/>
+macOS Ventura 13.2 <br/>
 
 
 Home Image: <a href="https://www.flaticon.com/free-icons/home" title="home icons">Home icons created by Dave Gandy - Flaticon</a>
