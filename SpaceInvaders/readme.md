@@ -7,7 +7,5 @@ Images & Sounds: <a href="https://student.cs.uwaterloo.ca/~cs349/1235/schedule/a
 
 Feature: Player can win even they don't destroy all enemies, as long as they can avoid collision with invaders.
 
-<video width="320" height="240" controls>
-  <source src="https://student.cs.uwaterloo.ca/~a372lee/SpaceInvaders/SpaceInvadersDemo.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+https://github.com/OHNOalan/UserInterface/assets/61731220/7fd74205-d066-446c-810b-10bf800f3ba2
+
