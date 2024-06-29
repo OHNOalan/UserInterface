@@ -13,8 +13,5 @@ Images: <br/>
 <a href="https://www.flaticon.com/free-icons/undo" title="undo icons">Undo icons created by Freepik - Flaticon</a> <br/>
 <a href="https://www.flaticon.com/free-icons/redo" title="redo icons">Redo icons created by Freepik - Flaticon</a> <br/>
 
-Cites: <br/>
-Pan Zoom Algorithm: CS349/Sample-Code/15.Android/PanZoom
-
 https://github.com/OHNOalan/UserInterface/assets/61731220/1337d439-a91c-46c2-aa55-7d4066555e40
 
